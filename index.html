@@ -8,6 +8,7 @@
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.12.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.1/firebase-auth-compat.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -455,8 +456,9 @@ function cartCount() { return Object.values(cart).reduce((s,q)=>s+q,0); }
 function deliveryFee() {
   const t = cartTotal();
   if(t === 0) return 0;
-  if(getFreeDeliveriesLeft() > 0) return 0; // free delivery for user
-  return 11; // ₹11 after free deliveries used
+  if(getFreeDeliveriesLeft() > 0) return 0; // free delivery for new users
+  if(t >= 300) return 0; // free above ₹300
+  return 11; // ₹11 below ₹300
 }
 function orderTotal() { return cartTotal()+deliveryFee(); }
 
@@ -629,7 +631,7 @@ function setView(v) {
 
 function renderListing() {
   sortBy=document.getElementById('sort-select').value;
-  priceMax=200;
+  priceMax=9999;
   document.getElementById('listing-title').textContent=(selectedCat==='All'?'All Products':selectedCat);
 
   // Filter & sort
@@ -780,10 +782,11 @@ function renderCart() {
       <div style="width:280px;flex-shrink:0">
         <div class="summary-box">
           <div style="font-weight:800;font-size:16px;margin-bottom:14px;color:var(--navy)">Order Summary</div>
-          <div class="progress-wrap"><div class="progress-fill" style="width:${pct}%;background:${pct>=100?'var(--green)':'var(--blue)'}"></div></div>
-          ${sub>=300
-            ? `<div style="color:var(--green);font-weight:700;font-size:13px;margin-bottom:12px">✓ You unlocked FREE delivery!</div>`
-            : `<div style="font-size:13px;margin-bottom:12px;color:#374151">Add <strong>₹${remaining}</strong> more for <strong>FREE delivery</strong></div>`}
+          ${getFreeDeliveriesLeft()>0
+            ? `<div style="background:#ecfdf5;border:1px solid #6ee7b7;border-radius:8px;padding:9px 12px;margin-bottom:12px;font-size:13px;color:#065f46;font-weight:700">🚚 Free delivery on this order! (${getFreeDeliveriesLeft()} left)</div>`
+            : sub>=300
+              ? `<div style="background:#ecfdf5;border:1px solid #6ee7b7;border-radius:8px;padding:9px 12px;margin-bottom:12px;font-size:13px;color:#065f46;font-weight:700">✓ Free delivery unlocked!</div>`
+              : `<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:9px 12px;margin-bottom:12px;font-size:13px;color:#1e40af">🛒 Add <strong>₹${300-sub}</strong> more to get <strong>FREE delivery!</strong></div>`}
           <div class="sum-row"><span>Subtotal (${count} items)</span><span>₹${sub}</span></div>
           <div class="sum-row"><span>Delivery Fee</span><span style="color:${fee===0?'var(--green)':'var(--red)'}">₹${fee===0?'FREE':fee}</span></div>
           <div style="border-top:2px solid var(--border);padding-top:12px;margin-top:4px;display:flex;justify-content:space-between">
@@ -882,7 +885,7 @@ function renderCheckout() {
           <div class="sum-row"><span style="font-size:13px">Subtotal</span><span>₹${sub}</span></div>
           <div class="sum-row"><span style="font-size:13px">Delivery</span><span style="color:${fee===0?'var(--green)':'#374151'}">₹${fee===0?'FREE':fee}</span></div>
           <div style="border-top:2px solid var(--border);padding-top:10px;margin-top:4px;display:flex;justify-content:space-between"><strong>Total</strong><strong style="color:var(--navy)">₹${tot}</strong></div>
-          ${sub>=300?`<div style="margin-top:8px;font-size:12px;color:var(--green);font-weight:700">✓ You saved ₹9 on delivery!</div>`:''}
+          ${sub>=300?`<div style="margin-top:8px;font-size:12px;color:var(--green);font-weight:700">✓ You saved ₹11 on delivery!</div>`:''}
         </div>
       </div>
     </div>`;
@@ -899,30 +902,32 @@ function copyOrderId(id) {
 function sendTelegramNotification(order) {
   const token = '8694777145:AAEfn8VOOVovur9MBTzjI4XKZz0U9wvcreQ';
   const chatId = '7914840486';
-  const items = order.items.map(({p,q}) => `• ${p.name} x${q} = ₹${p.price*q}`).join('\n');
+  const loginName = currentUser ? (currentUser.name || currentUser.email || 'Unknown') : 'Unknown';
   const addr = customerInfo.addr1
     + (customerInfo.addr2 ? ', ' + customerInfo.addr2 : '')
     + ', ' + customerInfo.city + ' – ' + customerInfo.pin;
-  const loginPhone = currentUser ? currentUser.phone : 'Unknown';
-  const msg =
-    `🆕 *NEW ORDER RECEIVED!*\n` +
-    `━━━━━━━━━━━━━━━━━━\n` +
-    `🔖 *ORDER ID: ${order.orderId}*\n` +
-    `━━━━━━━━━━━━━━━━━━\n\n` +
-    `👤 *Customer:* ${customerInfo.name}\n` +
-    `📞 *Phone:* ${customerInfo.phone}\n` +
-    `📱 *Login No:* ${loginPhone}\n` +
+
+  // Message 1 — Products list first
+  const msg1 =
+    `📦 *Order ${order.orderId} — Items:*\n\n` +
+    order.items.map(({p,q}) => `• ${p.name} × ${q}`).join('\n');
+
+  // Message 2 — Customer details + total
+  const msg2 =
+    `🆕 *NEW ORDER — ${order.orderId}*\n\n` +
+    `👤 *Name:* ${customerInfo.name}\n` +
+    `📞 *Number:* ${customerInfo.phone}\n` +
     `📍 *Address:* ${addr}\n\n` +
-    `📦 *Items:*\n${items}\n\n` +
-    `💰 *Subtotal:* ₹${order.sub}\n` +
-    `🚚 *Delivery:* ${order.fee === 0 ? 'FREE' : '₹' + order.fee}\n` +
-    `✅ *Total Paid:* ₹${order.tot}\n\n` +
-    `🕐 *Slot:* ${order.day}, ${order.slot}`;
-  fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+    `✅ *Total: ₹${order.tot}*`;
+
+  // Send both messages
+  const sendMsg = (text) => fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({chat_id: chatId, text: msg, parse_mode: 'Markdown'})
+    body: JSON.stringify({chat_id: chatId, text, parse_mode: 'Markdown'})
   });
+  sendMsg(msg1);
+  setTimeout(() => sendMsg(msg2), 1000);
 }
 
 function placeOrder() {
@@ -937,7 +942,8 @@ function placeOrder() {
   // Update user order count and save order to their history
   if(currentUser) {
     currentUser.orderCount = (currentUser.orderCount || 0) + 1;
-    const userOrders = JSON.parse(localStorage.getItem('scart_orders_'+currentUser.phone.replace('+91','')) || '[]');
+    const key = currentUser.uid || currentUser.phone || 'guest';
+    const userOrders = JSON.parse(localStorage.getItem('scart_orders_'+key) || '[]');
     userOrders.unshift({
       orderId: orderConfirm.orderId,
       date: new Date().toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'}),
@@ -947,8 +953,8 @@ function placeOrder() {
       statusColor: 'var(--blue)',
       statusBg: '#eff6ff'
     });
-    localStorage.setItem('scart_orders_'+currentUser.phone.replace('+91',''), JSON.stringify(userOrders));
-    saveUserData(currentUser.phone.replace('+91',''), currentUser);
+    localStorage.setItem('scart_orders_'+key, JSON.stringify(userOrders));
+    saveUserData(key, currentUser);
   }
 
   // Save to Firebase
@@ -1005,7 +1011,8 @@ function renderAccount() {
     // Load only THIS user's orders
     let userOrders = [];
     if(currentUser) {
-      userOrders = JSON.parse(localStorage.getItem('scart_orders_'+currentUser.phone.replace('+91','')) || '[]');
+      const key = currentUser.uid || currentUser.phone || 'guest';
+      userOrders = JSON.parse(localStorage.getItem('scart_orders_'+key) || '[]');
     }
     // Add current session order if not already saved
     if(orderConfirm && (!userOrders.length || userOrders[0].orderId !== orderConfirm.orderId)) {
@@ -1070,10 +1077,9 @@ function renderAccount() {
   document.getElementById('acc-content').innerHTML=html;
 }
 
-// ── USER LOGIN ────────────────────────────────────────────────────────────
+// ── GOOGLE LOGIN ──────────────────────────────────────────────────────────
 let currentUser = null;
-let pendingPhone = '';
-let generatedOTP = '';
+let pendingGoogleUser = null;
 
 function getFreeDeliveriesLeft() {
   if(!currentUser) return 3;
@@ -1085,81 +1091,68 @@ function updateAccountHeader() {
   const phoneEl = document.getElementById('acc-phone-display');
   const codeEl = document.getElementById('acc-referral-code');
   if(freeEl) freeEl.textContent = getFreeDeliveriesLeft();
-  if(phoneEl) phoneEl.textContent = currentUser ? currentUser.phone : 'Scart Member';
-  if(codeEl) codeEl.textContent = currentUser ? currentUser.referralCode||'------' : '------';
+  if(phoneEl) phoneEl.textContent = currentUser ? (currentUser.email||currentUser.name||'Scart Member') : 'Scart Member';
+  if(codeEl) codeEl.textContent = currentUser ? (currentUser.referralCode||'------') : '------';
 }
 function copyReferralCode() {
-  if(!currentUser || !currentUser.referralCode) return;
+  if(!currentUser||!currentUser.referralCode) return;
   navigator.clipboard.writeText(currentUser.referralCode).then(()=>showToast('Code copied! 🎉')).catch(()=>showToast(currentUser.referralCode));
 }
-function saveUserData(phone, data) {
-  localStorage.setItem('scart_user_'+phone, JSON.stringify(data));
+function saveUserData(uid, data) {
+  localStorage.setItem('scart_user_'+uid, JSON.stringify(data));
 }
-function getUserData(phone) {
-  const d = localStorage.getItem('scart_user_'+phone);
+function getUserData(uid) {
+  const d = localStorage.getItem('scart_user_'+uid);
   return d ? JSON.parse(d) : null;
 }
-function generateOTP() { return String(Math.floor(100000+Math.random()*900000)); }
-function generateReferralCode(phone) { return 'SCT'+phone.slice(-4)+Math.random().toString(36).slice(2,5).toUpperCase(); }
-
-function sendOTP() {
-  const phone = document.getElementById('login-phone').value.trim();
-  const err = document.getElementById('phone-error');
-  if(phone.length!==10||!/^\d{10}$/.test(phone)){err.style.display='block';return;}
-  err.style.display='none';
-  pendingPhone = phone;
-  generatedOTP = generateOTP();
-  document.getElementById('step-phone').style.display='none';
-  document.getElementById('step-otp').style.display='block';
-  document.getElementById('otp-sent-msg').innerHTML=
-    `OTP sent to <strong>+91 ${phone}</strong><br>
-     <span style="background:#fffbeb;border:1px solid #fde68a;border-radius:6px;padding:6px 14px;font-size:28px;font-weight:800;letter-spacing:8px;color:#92400e;display:inline-block;margin-top:10px">${generatedOTP}</span>`;
-  document.getElementById('otp-input').value='';
-  document.getElementById('otp-error').style.display='none';
+function generateReferralCode(uid) {
+  return 'SCT'+uid.slice(-4).toUpperCase()+Math.random().toString(36).slice(2,5).toUpperCase();
 }
 
-function resendOTP() {
-  generatedOTP = generateOTP();
-  document.getElementById('otp-sent-msg').innerHTML=
-    `New OTP for <strong>+91 ${pendingPhone}</strong><br>
-     <span style="background:#fffbeb;border:1px solid #fde68a;border-radius:6px;padding:6px 14px;font-size:28px;font-weight:800;letter-spacing:8px;color:#92400e;display:inline-block;margin-top:10px">${generatedOTP}</span>`;
-  showToast('OTP resent!');
+function signInWithGoogle() {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  firebase.auth().signInWithPopup(provider)
+    .then(result => {
+      const user = result.user;
+      pendingGoogleUser = user;
+      const existing = getUserData(user.uid);
+      if(!existing) {
+        // New user — show referral step
+        document.getElementById('step-google').style.display = 'none';
+        document.getElementById('step-referral').style.display = 'block';
+      } else {
+        // Existing user — login directly
+        finishLogin(user, null);
+      }
+    })
+    .catch(err => {
+      const errEl = document.getElementById('login-error');
+      if(errEl) { errEl.textContent = '❌ ' + err.message; errEl.style.display = 'block'; }
+    });
 }
 
-function verifyOTP() {
-  const entered = document.getElementById('otp-input').value.trim();
-  const err = document.getElementById('otp-error');
-  if(entered !== generatedOTP){err.style.display='block';return;}
-  err.style.display='none';
-  // New user → show referral step
-  const existing = getUserData(pendingPhone);
-  if(!existing) {
-    document.getElementById('step-otp').style.display='none';
-    document.getElementById('step-referral').style.display='block';
-  } else {
-    loginUser(pendingPhone, null);
-  }
-}
-
-function applyReferralAndLogin() {
+function applyReferralAndFinish() {
   const code = document.getElementById('referral-input').value.trim().toUpperCase();
-  loginUser(pendingPhone, code);
+  finishLogin(pendingGoogleUser, code);
 }
 
-function loginUser(phone, referralCode) {
-  let userData = getUserData(phone);
+function finishLogin(firebaseUser, referralCode) {
+  let userData = getUserData(firebaseUser.uid);
   let referralMsg = '';
 
   if(!userData) {
     userData = {
-      phone: '+91'+phone,
-      referralCode: generateReferralCode(phone),
+      uid: firebaseUser.uid,
+      name: firebaseUser.displayName || '',
+      email: firebaseUser.email || '',
+      photo: firebaseUser.photoURL || '',
+      referralCode: generateReferralCode(firebaseUser.uid),
       orderCount: 0,
       freeDeliveries: 3,
       joinedDate: new Date().toLocaleDateString()
     };
 
-    // Apply referral code if entered
+    // Apply referral if entered
     if(referralCode && referralCode.length >= 6) {
       let found = false;
       for(let i = 0; i < localStorage.length; i++) {
@@ -1167,7 +1160,7 @@ function loginUser(phone, referralCode) {
         if(key && key.startsWith('scart_user_')) {
           try {
             const u = JSON.parse(localStorage.getItem(key));
-            if(u && u.referralCode === referralCode && u.phone !== '+91'+phone) {
+            if(u && u.referralCode === referralCode && u.uid !== firebaseUser.uid) {
               userData.freeDeliveries += 1;
               found = true;
               break;
@@ -1183,13 +1176,13 @@ function loginUser(phone, referralCode) {
         return;
       }
     }
-    saveUserData(phone, userData);
+    saveUserData(firebaseUser.uid, userData);
   }
 
   currentUser = userData;
-  localStorage.setItem('scart_last_phone', phone);
-  document.getElementById('login-modal').style.display='none';
-  showToast(referralMsg || 'Welcome to Scart! 🎉');
+  localStorage.setItem('scart_last_uid', firebaseUser.uid);
+  document.getElementById('login-modal').style.display = 'none';
+  showToast(referralMsg || `Welcome, ${userData.name||'to Scart'}! 🎉`);
   updateDeliveryInfo();
 }
 
@@ -1377,17 +1370,31 @@ async function saveCustomerToFirebase(phone, name) {
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────
-// Auto-login if same device
-(function() {
-  const saved = localStorage.getItem('scart_last_phone');
-  if(saved) {
-    const data = getUserData(saved);
-    if(data) {
-      currentUser = data;
+// Auto-login returning users via Firebase auth state
+firebase.auth().onAuthStateChanged(function(user) {
+  if(user) {
+    const saved = getUserData(user.uid);
+    if(saved) {
+      currentUser = saved;
       document.getElementById('login-modal').style.display = 'none';
+      updateAccountHeader();
+    } else {
+      // Logged in via Google but no local data — finish setup
+      finishLogin(user, null);
+    }
+  } else {
+    // Check if we have a remembered last user (skip modal if so)
+    const lastUid = localStorage.getItem('scart_last_uid');
+    if(lastUid) {
+      const saved = getUserData(lastUid);
+      if(saved) {
+        currentUser = saved;
+        document.getElementById('login-modal').style.display = 'none';
+        updateAccountHeader();
+      }
     }
   }
-})();
+});
 document.getElementById('hero-search').addEventListener('input', function() {
   searchQ = this.value.trim();
   if(searchQ.length > 0) { selectedCat='All'; nav('listing'); }
@@ -1395,44 +1402,36 @@ document.getElementById('hero-search').addEventListener('input', function() {
 document.getElementById('hero-search').addEventListener('keydown',e=>{if(e.key==='Enter')doSearch();});
 renderHome();
 </script>
-<!-- ── PHONE LOGIN MODAL ── -->
+<!-- ── GMAIL LOGIN MODAL ── -->
 <div id="login-modal" style="display:flex;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:1000;align-items:center;justify-content:center">
-  <div style="background:#fff;border-radius:20px;padding:32px 24px;width:340px;max-width:92vw;box-shadow:0 24px 60px rgba(0,0,0,.3);text-align:center">
+  <div style="background:#fff;border-radius:20px;padding:36px 24px;width:340px;max-width:92vw;box-shadow:0 24px 60px rgba(0,0,0,.3);text-align:center">
     <div style="font-family:'DM Serif Display',serif;font-size:28px;color:#1a3a6b;margin-bottom:4px">S<span style="color:#f59e0b">c</span>art</div>
-    <div style="font-size:13px;color:#6b7280;margin-bottom:20px">Shop Smart · Fast Delivery</div>
-    <!-- Step 1: Phone -->
-    <div id="step-phone">
-      <div style="font-size:34px;margin-bottom:10px">📱</div>
-      <div style="font-weight:800;font-size:17px;color:#1a3a6b;margin-bottom:5px">Enter your phone number</div>
-      <div style="font-size:13px;color:#6b7280;margin-bottom:16px">One time login — we'll remember your device!</div>
-      <div style="display:flex;gap:8px;margin-bottom:10px">
-        <div style="background:#f4f6fb;border:1.5px solid #e8edf5;border-radius:8px;padding:10px 12px;font-weight:700;font-size:14px;color:#1a3a6b;flex-shrink:0">🇮🇳 +91</div>
-        <input id="login-phone" class="inp" type="tel" placeholder="10 digit number" maxlength="10" style="margin-bottom:0;flex:1" onkeydown="if(event.key==='Enter')sendOTP()"/>
-      </div>
-      <div id="phone-error" style="display:none;color:#ef4444;font-size:12px;font-weight:700;margin-bottom:8px">⚠️ Enter a valid 10 digit number</div>
-      <button class="btn btn-primary" onclick="sendOTP()" style="margin-bottom:0">Send OTP →</button>
-    </div>
-    <!-- Step 2: OTP -->
-    <div id="step-otp" style="display:none">
-      <div style="font-size:34px;margin-bottom:10px">🔐</div>
-      <div style="font-weight:800;font-size:17px;color:#1a3a6b;margin-bottom:5px">Enter OTP</div>
-      <div id="otp-sent-msg" style="font-size:13px;color:#6b7280;margin-bottom:16px"></div>
-      <input id="otp-input" class="inp" type="number" placeholder="Enter 6 digit OTP" style="text-align:center;font-size:22px;font-weight:800;letter-spacing:8px" onkeydown="if(event.key==='Enter')verifyOTP()"/>
-      <div id="otp-error" style="display:none;color:#ef4444;font-size:12px;font-weight:700;margin-bottom:8px">❌ Wrong OTP. Try again.</div>
-      <button class="btn btn-primary" onclick="verifyOTP()" style="margin-bottom:8px">Verify & Login ✓</button>
-      <button onclick="resendOTP()" style="background:none;border:none;color:var(--blue);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Resend OTP</button>
-    </div>
-    <!-- Step 3: Referral -->
-    <div id="step-referral" style="display:none">
-      <div style="font-size:34px;margin-bottom:10px">🎁</div>
-      <div style="font-weight:800;font-size:17px;color:#1a3a6b;margin-bottom:5px">Have a Referral Code?</div>
-      <div style="font-size:13px;color:#6b7280;margin-bottom:16px">Enter to get 1 extra free delivery!</div>
-      <input id="referral-input" class="inp" type="text" placeholder="Enter referral code (optional)" style="text-align:center;text-transform:uppercase;font-weight:700;letter-spacing:2px"/>
+    <div style="font-size:13px;color:#6b7280;margin-bottom:24px">Shop Smart · Fast Delivery</div>
+    <div style="font-size:40px;margin-bottom:12px">👋</div>
+    <div style="font-weight:800;font-size:18px;color:#1a3a6b;margin-bottom:6px">Welcome to Scart!</div>
+    <div style="font-size:13px;color:#6b7280;margin-bottom:24px">Sign in to start shopping</div>
+
+    <!-- Referral input (shown after login for new users) -->
+    <div id="step-referral" style="display:none;margin-bottom:16px">
+      <div style="font-size:28px;margin-bottom:8px">🎁</div>
+      <div style="font-weight:700;font-size:15px;color:#1a3a6b;margin-bottom:4px">Have a Referral Code?</div>
+      <div style="font-size:12px;color:#6b7280;margin-bottom:12px">Get 1 extra free delivery!</div>
+      <input id="referral-input" class="inp" type="text" placeholder="Enter code (optional)" style="text-align:center;text-transform:uppercase;font-weight:700;letter-spacing:2px;margin-bottom:8px"/>
       <div id="referral-msg" style="display:none;font-size:12px;font-weight:700;margin-bottom:8px"></div>
-      <button class="btn btn-primary" onclick="applyReferralAndLogin()" style="margin-bottom:8px">Continue →</button>
-      <button onclick="applyReferralAndLogin()" style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;font-family:inherit">Skip</button>
+      <button class="btn btn-primary" onclick="applyReferralAndFinish()" style="margin-bottom:6px">Continue →</button>
+      <button onclick="applyReferralAndFinish()" style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;font-family:inherit">Skip</button>
     </div>
-    <div style="font-size:11px;color:#9ca3af;margin-top:14px">✅ Login once — never asked again on this device</div>
+
+    <!-- Google Sign In button -->
+    <div id="step-google">
+      <button onclick="signInWithGoogle()" style="display:flex;align-items:center;justify-content:center;gap:12px;width:100%;background:#fff;border:2px solid #e8edf5;border-radius:12px;padding:14px 20px;font-size:15px;font-weight:700;color:#374151;cursor:pointer;font-family:inherit;transition:.2s;box-shadow:0 2px 8px rgba(0,0,0,.08)" onmouseover="this.style.borderColor='#4285f4';this.style.background='#f8f9ff'" onmouseout="this.style.borderColor='#e8edf5';this.style.background='#fff'">
+        <img src="https://www.google.com/favicon.ico" style="width:20px;height:20px"/>
+        Continue with Google
+      </button>
+      <div id="login-error" style="display:none;color:#ef4444;font-size:12px;font-weight:700;margin-top:10px"></div>
+    </div>
+
+    <div style="font-size:11px;color:#9ca3af;margin-top:16px">✅ Sign in once — remembered on this device</div>
   </div>
 </div>
 
