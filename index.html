@@ -1282,6 +1282,8 @@ function adminAddProduct() {
   setTimeout(()=>msg.style.display='none', 3000);
 
   renderAdminPanel();
+  renderHome();
+  renderListing();
   showToast(`"${name}" added to store! ✓`);
 }
 
@@ -1299,12 +1301,42 @@ function adminEditProduct(id) {
     document.getElementById('adm-img-preview').src = p.imgUrl;
     document.getElementById('adm-preview').style.display='block';
   }
-  // Remove old entry so "Add" saves as updated
-  const idx = PRODUCTS.findIndex(x=>x.id===id);
-  PRODUCTS.splice(idx,1);
-  renderAdminPanel();
-  showToast('Editing – update and re-add');
+  // Change button to Update
+  const btn = document.querySelector('button[onclick="adminAddProduct()"]');
+  if(btn) { btn.textContent='✅ Update Product'; btn.setAttribute('onclick', `adminUpdateProduct(${id})`); }
   window.scrollTo(0,0);
+  showToast('✏️ Editing "'+p.name+'" — change and click Update');
+}
+
+function adminUpdateProduct(id) {
+  const idx = PRODUCTS.findIndex(x=>x.id===id);
+  if(idx===-1) return;
+  const name   = document.getElementById('adm-name').value.trim();
+  const brand  = document.getElementById('adm-brand').value.trim();
+  const price  = parseFloat(document.getElementById('adm-price').value);
+  const mrp    = parseFloat(document.getElementById('adm-mrp').value) || price;
+  const cat    = document.getElementById('adm-cat').value;
+  const badge  = document.getElementById('adm-badge').value || null;
+  const imgUrl = document.getElementById('adm-imgurl').value.trim() || '';
+  const seller = document.getElementById('adm-seller').value.trim() || 'Scart Seller';
+  if(!name||!brand||!price||!cat){showToast('⚠️ Fill all required fields');return;}
+  // Update in place — keep same ID
+  PRODUCTS[idx] = {...PRODUCTS[idx], name, brand, price, mrp, cat, badge, imgUrl, seller};
+  // Clear form
+  ['adm-name','adm-brand','adm-price','adm-mrp','adm-imgurl','adm-seller'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('adm-cat').value='';
+  document.getElementById('adm-badge').value='';
+  document.getElementById('adm-preview').style.display='none';
+  // Reset button back to Add
+  const btn = document.querySelector('button[onclick^="adminUpdateProduct"]');
+  if(btn) { btn.textContent='✅ Add Product'; btn.setAttribute('onclick','adminAddProduct()'); }
+  const msg = document.getElementById('adm-msg');
+  msg.textContent=`✅ "${name}" updated!`; msg.style.display='block';
+  setTimeout(()=>msg.style.display='none',3000);
+  renderAdminPanel();
+  renderHome();
+  renderListing();
+  showToast(`"${name}" updated! ✓`);
 }
 
 function adminDeleteProduct(id) {
@@ -1316,20 +1348,25 @@ function adminDeleteProduct(id) {
   wishlist.delete(id);
   updateCartUI();
   renderAdminPanel();
+  renderHome();
+  renderListing();
   showToast(`"${name}" removed`);
 }
 
 // ── FIREBASE INIT ─────────────────────────────────────────────────────────
-const firebaseConfig = {
-  apiKey: "AIzaSyBrugZz2SFGLO400Chs8sqpmNLYMZyPlqQ",
-  authDomain: "scart-69b9a.firebaseapp.com",
-  projectId: "scart-69b9a",
-  storageBucket: "scart-69b9a.firebasestorage.app",
-  messagingSenderId: "453109058340",
-  appId: "1:453109058340:web:a02b122e23e55ffe4381b1"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+let db = null;
+try {
+  const firebaseConfig = {
+    apiKey: "AIzaSyBrugZz2SFGLO400Chs8sqpmNLYMZyPlqQ",
+    authDomain: "scart-69b9a.firebaseapp.com",
+    projectId: "scart-69b9a",
+    storageBucket: "scart-69b9a.firebasestorage.app",
+    messagingSenderId: "453109058340",
+    appId: "1:453109058340:web:a02b122e23e55ffe4381b1"
+  };
+  if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+  db = firebase.firestore();
+} catch(e) { console.warn('Firebase init:', e); }
 
 // ── FIRESTORE FUNCTIONS ───────────────────────────────────────────────────
 
