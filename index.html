@@ -1269,7 +1269,9 @@ function adminAddProduct() {
   if(!name || !brand || !price || !cat) { showToast('⚠️ Fill all required fields'); return; }
 
   const newId = Math.max(...PRODUCTS.map(p=>p.id)) + 1;
-  PRODUCTS.push({id:newId, name, brand, price, mrp, cat, badge, img:'🛍️', imgUrl, rating:4.0, reviews:0, seller, sellerRating:4.5});
+  const newProduct = {id:newId, name, brand, price, mrp, cat, badge, img:'🛍️', imgUrl, rating:4.0, reviews:0, seller, sellerRating:4.5};
+  PRODUCTS.push(newProduct);
+  saveProductToFirebase(newProduct);
 
   // Clear form
   ['adm-name','adm-brand','adm-price','adm-mrp','adm-imgurl','adm-seller'].forEach(id=>document.getElementById(id).value='');
@@ -1322,6 +1324,7 @@ function adminUpdateProduct(id) {
   if(!name||!brand||!price||!cat){showToast('⚠️ Fill all required fields');return;}
   // Update in place — keep same ID
   PRODUCTS[idx] = {...PRODUCTS[idx], name, brand, price, mrp, cat, badge, imgUrl, seller};
+  saveProductToFirebase(PRODUCTS[idx]);
   // Clear form
   ['adm-name','adm-brand','adm-price','adm-mrp','adm-imgurl','adm-seller'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('adm-cat').value='';
@@ -1344,6 +1347,7 @@ function adminDeleteProduct(id) {
   if(idx===-1) return;
   const name = PRODUCTS[idx].name;
   PRODUCTS.splice(idx,1);
+  deleteProductFromFirebase(id);
   delete cart[id];
   wishlist.delete(id);
   updateCartUI();
@@ -1406,6 +1410,40 @@ async function saveCustomerToFirebase(phone, name) {
   }
 }
 
+// ── PRODUCT FIREBASE FUNCTIONS ────────────────────────────────────────────
+async function saveProductToFirebase(product) {
+  if(!db) return;
+  try {
+    await db.collection('products').doc(String(product.id)).set(product);
+  } catch(e) { console.error('Product save error:', e); }
+}
+
+async function deleteProductFromFirebase(id) {
+  if(!db) return;
+  try {
+    await db.collection('products').doc(String(id)).delete();
+  } catch(e) { console.error('Product delete error:', e); }
+}
+
+async function loadProductsFromFirebase() {
+  if(!db) return;
+  try {
+    const snap = await db.collection('products').get();
+    if(snap.empty) return;
+    snap.forEach(doc => {
+      const p = doc.data();
+      if(!PRODUCTS.find(x => x.id === p.id)) {
+        PRODUCTS.push(p);
+      } else {
+        const idx = PRODUCTS.findIndex(x => x.id === p.id);
+        PRODUCTS[idx] = p;
+      }
+    });
+    renderHome();
+    renderListing();
+  } catch(e) { console.error('Load products error:', e); }
+}
+
 // ── INIT ──────────────────────────────────────────────────────────────────
 // Auto-login returning users via Firebase auth state
 firebase.auth().onAuthStateChanged(function(user) {
@@ -1438,6 +1476,7 @@ document.getElementById('hero-search').addEventListener('input', function() {
 });
 document.getElementById('hero-search').addEventListener('keydown',e=>{if(e.key==='Enter')doSearch();});
 renderHome();
+loadProductsFromFirebase();
 </script>
 <!-- ── GMAIL LOGIN MODAL ── -->
 <div id="login-modal" style="display:flex;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:1000;align-items:center;justify-content:center">
