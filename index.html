@@ -386,7 +386,7 @@ input,select{font-family:inherit}
 
 <script>
 // ── DATA ──────────────────────────────────────────────────────────────────
-const PRODUCTS = [
+const BASE_PRODUCTS = [
   {id:1,name:"Kurkure (10 Pack)",price:10,mrp:10,cat:"Grocery",brand:"PepsiCo",rating:4.2,reviews:341,img:"🌽",imgUrl:"https://i.ibb.co/cKQ19Q98/71-Ly-Klizpu-L-AC-UF894-1000-QL80.jpg",badge:null,seller:"Scart Seller",sellerRating:4.5},
   {id:2,name:"Xo Pen",price:10,mrp:10,cat:"Stationery",brand:"Xo",rating:4.0,reviews:80,img:"🖊️",imgUrl:"https://i.ibb.co/CKXYCpvM/IMG-20260420-WA0095.jpg",badge:null,seller:"Scart Seller",sellerRating:4.5},
   {id:3,name:"Puffcorn",price:10,mrp:10,cat:"Grocery",brand:"PepsiCo",rating:4.1,reviews:150,img:"🍿",imgUrl:"https://i.ibb.co/xqDFdBNY/81w-JJZZ7-Xu-L.jpg",badge:null,seller:"Scart Seller",sellerRating:4.5},
@@ -414,6 +414,24 @@ const PRODUCTS = [
   {id:25,name:"Ziggy Donut Cake",price:20,mrp:20,cat:"Grocery",brand:"Ziggy",rating:4.3,reviews:95,img:"🍩",imgUrl:"https://i.ibb.co/KRHVx7k/Screenshot-20260421-160305-Google.jpg",badge:null,seller:"Scart Seller",sellerRating:4.5},
   {id:26,name:"Ziggy Choco Star",price:20,mrp:20,cat:"Grocery",brand:"Ziggy",rating:4.4,reviews:105,img:"⭐",imgUrl:"https://i.ibb.co/tT0k1VJR/Screenshot-20260421-160326-Google.jpg",badge:null,seller:"Scart Seller",sellerRating:4.5},
 ];
+
+// Load products from localStorage (admin changes) merged with base products
+function loadSavedProducts() {
+  try {
+    const saved = localStorage.getItem('scart_products');
+    if(saved) return JSON.parse(saved);
+  } catch(e) {}
+  return null;
+}
+
+function saveProductsToStorage() {
+  try {
+    localStorage.setItem('scart_products', JSON.stringify(PRODUCTS));
+  } catch(e) {}
+}
+
+const savedProds = loadSavedProducts();
+const PRODUCTS = savedProds ? savedProds : [...BASE_PRODUCTS];
 
 // ── ORDER HISTORY ─────────────────────────────────────────────────────────
 // Orders stored per user in localStorage — no shared fake history
@@ -1272,6 +1290,7 @@ function adminAddProduct() {
   const newProduct = {id:newId, name, brand, price, mrp, cat, badge, img:'🛍️', imgUrl, rating:4.0, reviews:0, seller, sellerRating:4.5};
   PRODUCTS.push(newProduct);
   saveProductToFirebase(newProduct);
+  saveProductsToStorage();
 
   // Clear form
   ['adm-name','adm-brand','adm-price','adm-mrp','adm-imgurl','adm-seller'].forEach(id=>document.getElementById(id).value='');
@@ -1325,6 +1344,7 @@ function adminUpdateProduct(id) {
   // Update in place — keep same ID
   PRODUCTS[idx] = {...PRODUCTS[idx], name, brand, price, mrp, cat, badge, imgUrl, seller};
   saveProductToFirebase(PRODUCTS[idx]);
+  saveProductsToStorage();
   // Clear form
   ['adm-name','adm-brand','adm-price','adm-mrp','adm-imgurl','adm-seller'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('adm-cat').value='';
@@ -1348,6 +1368,7 @@ function adminDeleteProduct(id) {
   const name = PRODUCTS[idx].name;
   PRODUCTS.splice(idx,1);
   deleteProductFromFirebase(id);
+  saveProductsToStorage();
   delete cart[id];
   wishlist.delete(id);
   updateCartUI();
