@@ -474,9 +474,8 @@ function cartCount() { return Object.values(cart).reduce((s,q)=>s+q,0); }
 function deliveryFee() {
   const t = cartTotal();
   if(t === 0) return 0;
-  if(getFreeDeliveriesLeft() > 0) return 0; // free delivery for new users
-  if(t >= 300) return 0; // free above ₹300
-  return 11; // ₹11 below ₹300
+  if(getFreeDeliveriesLeft() > 0) return 0; // first 2 orders free
+  return 15; // ₹15 after free deliveries used
 }
 function orderTotal() { return cartTotal()+deliveryFee(); }
 
@@ -1101,7 +1100,7 @@ let pendingGoogleUser = null;
 
 function getFreeDeliveriesLeft() {
   if(!currentUser) return 3;
-  return Math.max(0, (currentUser.freeDeliveries||3) - (currentUser.orderCount||0));
+  return Math.max(0, (currentUser.freeDeliveries||2) - (currentUser.orderCount||0));
 }
 function updateDeliveryInfo() { if(currentPage==='account') renderAccount(); }
 function updateAccountHeader() {
@@ -1117,36 +1116,68 @@ function copyReferralCode() {
   navigator.clipboard.writeText(currentUser.referralCode).then(()=>showToast('Code copied! 🎉')).catch(()=>showToast(currentUser.referralCode));
 }
 function saveUserData(uid, data) {
+  // Save to localStorage for instant access
   localStorage.setItem('scart_user_'+uid, JSON.stringify(data));
+  // Also save to Firebase for cross-device sync
+  if(db) {
+    db.collection('users').doc(uid).set(data, {merge:true}).catch(e=>console.warn('User save:', e));
+  }
 }
+
 function getUserData(uid) {
   const d = localStorage.getItem('scart_user_'+uid);
   return d ? JSON.parse(d) : null;
+}
+
+async function loadUserFromFirebase(uid) {
+  if(!db) return null;
+  try {
+    const doc = await db.collection('users').doc(uid).get();
+    if(doc.exists) {
+      const data = doc.data();
+      // Sync Firebase data to localStorage
+      localStorage.setItem('scart_user_'+uid, JSON.stringify(data));
+      localStorage.setItem('scart_last_uid', uid);
+      return data;
+    }
+  } catch(e) { console.warn('User load:', e); }
+  return null;
 }
 function generateReferralCode(uid) {
   return 'SCT'+uid.slice(-4).toUpperCase()+Math.random().toString(36).slice(2,5).toUpperCase();
 }
 
 function signInWithGoogle() {
-  const provider = new firebase.auth.GoogleAuthProvider();
-  firebase.auth().signInWithPopup(provider)
-    .then(result => {
-      const user = result.user;
-      pendingGoogleUser = user;
-      const existing = getUserData(user.uid);
-      if(!existing) {
-        // New user — show referral step
-        document.getElementById('step-google').style.display = 'none';
-        document.getElementById('step-referral').style.display = 'block';
-      } else {
-        // Existing user — login directly
-        finishLogin(user, null);
-      }
-    })
-    .catch(err => {
-      const errEl = document.getElementById('login-error');
-      if(errEl) { errEl.textContent = '❌ ' + err.message; errEl.style.display = 'block'; }
-    });
+  try {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    firebase.auth().signInWithPopup(provider)
+      .then(async result => {
+        const user = result.user;
+        pendingGoogleUser = user;
+        // Try Firebase first for cross-device sync
+        const firebaseData = await loadUserFromFirebase(user.uid);
+        if(firebaseData) {
+          // Existing user from Firebase — login directly
+          finishLogin(user, null);
+        } else {
+          const localData = getUserData(user.uid);
+          if(localData) {
+            finishLogin(user, null);
+          } else {
+            // Brand new user — show referral step
+            document.getElementById('step-google').style.display = 'none';
+            document.getElementById('step-referral').style.display = 'block';
+          }
+        }
+      })
+      .catch(err => {
+        const errEl = document.getElementById('login-error');
+        if(errEl) { errEl.textContent = '❌ ' + err.message; errEl.style.display = 'block'; }
+      });
+  } catch(e) {
+    const errEl = document.getElementById('login-error');
+    if(errEl) { errEl.textContent = '❌ Google login not configured yet'; errEl.style.display = 'block'; }
+  }
 }
 
 function applyReferralAndFinish() {
@@ -1166,7 +1197,7 @@ function finishLogin(firebaseUser, referralCode) {
       photo: firebaseUser.photoURL || '',
       referralCode: generateReferralCode(firebaseUser.uid),
       orderCount: 0,
-      freeDeliveries: 3,
+      freeDeliveries: 2,
       joinedDate: new Date().toLocaleDateString()
     };
 
@@ -1466,31 +1497,48 @@ async function loadProductsFromFirebase() {
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────
-// Auto-login returning users via Firebase auth state
-firebase.auth().onAuthStateChanged(function(user) {
-  if(user) {
-    const saved = getUserData(user.uid);
-    if(saved) {
-      currentUser = saved;
-      document.getElementById('login-modal').style.display = 'none';
-      updateAccountHeader();
-    } else {
-      // Logged in via Google but no local data — finish setup
-      finishLogin(user, null);
-    }
+// Instant check — hide/show login modal before Firebase loads
+(function() {
+  const lastUid = localStorage.getItem('scart_last_uid');
+  if(lastUid && getUserData(lastUid)) {
+    // Returning user — hide modal instantly
+    currentUser = getUserData(lastUid);
+    document.getElementById('login-modal').style.display = 'none';
+    updateAccountHeader();
   } else {
-    // Check if we have a remembered last user (skip modal if so)
-    const lastUid = localStorage.getItem('scart_last_uid');
-    if(lastUid) {
-      const saved = getUserData(lastUid);
-      if(saved) {
-        currentUser = saved;
+    // New user — show modal
+    document.getElementById('login-modal').style.display = 'flex';
+  }
+})();
+
+// Firebase auth state — confirm login in background
+try {
+  firebase.auth().onAuthStateChanged(async function(user) {
+    if(user) {
+      // Load from Firebase for cross-device sync
+      const firebaseData = await loadUserFromFirebase(user.uid);
+      if(firebaseData) {
+        currentUser = firebaseData;
         document.getElementById('login-modal').style.display = 'none';
         updateAccountHeader();
+      } else {
+        const localData = getUserData(user.uid);
+        if(localData) {
+          currentUser = localData;
+          document.getElementById('login-modal').style.display = 'none';
+          updateAccountHeader();
+        } else {
+          finishLogin(user, null);
+        }
+      }
+    } else {
+      const lastUid = localStorage.getItem('scart_last_uid');
+      if(!lastUid || !getUserData(lastUid)) {
+        document.getElementById('login-modal').style.display = 'flex';
       }
     }
-  }
-});
+  });
+} catch(e) { console.warn('Auth error:', e); }
 document.getElementById('hero-search').addEventListener('input', function() {
   searchQ = this.value.trim();
   if(searchQ.length > 0) { selectedCat='All'; nav('listing'); }
@@ -1500,7 +1548,7 @@ renderHome();
 loadProductsFromFirebase();
 </script>
 <!-- ── GMAIL LOGIN MODAL ── -->
-<div id="login-modal" style="display:flex;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:1000;align-items:center;justify-content:center">
+<div id="login-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:1000;align-items:center;justify-content:center">
   <div style="background:#fff;border-radius:20px;padding:36px 24px;width:340px;max-width:92vw;box-shadow:0 24px 60px rgba(0,0,0,.3);text-align:center">
     <div style="font-family:'DM Serif Display',serif;font-size:28px;color:#1a3a6b;margin-bottom:4px">S<span style="color:#f59e0b">c</span>art</div>
     <div style="font-size:13px;color:#6b7280;margin-bottom:24px">Shop Smart · Fast Delivery</div>
