@@ -214,6 +214,34 @@ input,select{font-family:inherit}
 <!-- ── TOAST ── -->
 <div id="toast"></div>
 
+<!-- ── GMAIL LOGIN MODAL ── -->
+<div id="login-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:1000;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:20px;padding:36px 24px;width:340px;max-width:92vw;box-shadow:0 24px 60px rgba(0,0,0,.3);text-align:center">
+    <div style="font-family:'DM Serif Display',serif;font-size:28px;color:#1a3a6b;margin-bottom:4px">S<span style="color:#f59e0b">c</span>art</div>
+    <div style="font-size:13px;color:#6b7280;margin-bottom:24px">Shop Smart · Fast Delivery</div>
+    <div style="font-size:40px;margin-bottom:12px">👋</div>
+    <div style="font-weight:800;font-size:18px;color:#1a3a6b;margin-bottom:6px">Welcome to Scart!</div>
+    <div style="font-size:13px;color:#6b7280;margin-bottom:24px">Sign in to start shopping</div>
+    <div id="step-referral" style="display:none;margin-bottom:16px">
+      <div style="font-size:28px;margin-bottom:8px">🎁</div>
+      <div style="font-weight:700;font-size:15px;color:#1a3a6b;margin-bottom:4px">Have a Referral Code?</div>
+      <div style="font-size:12px;color:#6b7280;margin-bottom:12px">Get 1 extra free delivery!</div>
+      <input id="referral-input" class="inp" type="text" placeholder="Enter code (optional)" style="text-align:center;text-transform:uppercase;font-weight:700;letter-spacing:2px;margin-bottom:8px"/>
+      <div id="referral-msg" style="display:none;font-size:12px;font-weight:700;margin-bottom:8px"></div>
+      <button class="btn btn-primary" onclick="applyReferralAndFinish()" style="margin-bottom:6px">Continue →</button>
+      <button onclick="applyReferralAndFinish()" style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;font-family:inherit">Skip</button>
+    </div>
+    <div id="step-google">
+      <button onclick="signInWithGoogle()" style="display:flex;align-items:center;justify-content:center;gap:12px;width:100%;background:#fff;border:2px solid #e8edf5;border-radius:12px;padding:14px 20px;font-size:15px;font-weight:700;color:#374151;cursor:pointer;font-family:inherit;box-shadow:0 2px 8px rgba(0,0,0,.08)">
+        <img src="https://www.google.com/favicon.ico" style="width:20px;height:20px"/>
+        Continue with Google
+      </button>
+      <div id="login-error" style="display:none;color:#ef4444;font-size:12px;font-weight:700;margin-top:10px"></div>
+    </div>
+    <div style="font-size:11px;color:#9ca3af;margin-top:16px">✅ Sign in once — remembered on this device</div>
+  </div>
+</div>
+
 <!-- ── HOME PAGE ── -->
 <div id="page-home" class="page">
   <div class="hero">
@@ -1555,39 +1583,6 @@ document.getElementById('hero-search').addEventListener('keydown',e=>{if(e.key==
 renderHome();
 loadProductsFromFirebase();
 </script>
-<!-- ── GMAIL LOGIN MODAL ── -->
-<div id="login-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:1000;align-items:center;justify-content:center">
-  <div style="background:#fff;border-radius:20px;padding:36px 24px;width:340px;max-width:92vw;box-shadow:0 24px 60px rgba(0,0,0,.3);text-align:center">
-    <div style="font-family:'DM Serif Display',serif;font-size:28px;color:#1a3a6b;margin-bottom:4px">S<span style="color:#f59e0b">c</span>art</div>
-    <div style="font-size:13px;color:#6b7280;margin-bottom:24px">Shop Smart · Fast Delivery</div>
-    <div style="font-size:40px;margin-bottom:12px">👋</div>
-    <div style="font-weight:800;font-size:18px;color:#1a3a6b;margin-bottom:6px">Welcome to Scart!</div>
-    <div style="font-size:13px;color:#6b7280;margin-bottom:24px">Sign in to start shopping</div>
-
-    <!-- Referral input (shown after login for new users) -->
-    <div id="step-referral" style="display:none;margin-bottom:16px">
-      <div style="font-size:28px;margin-bottom:8px">🎁</div>
-      <div style="font-weight:700;font-size:15px;color:#1a3a6b;margin-bottom:4px">Have a Referral Code?</div>
-      <div style="font-size:12px;color:#6b7280;margin-bottom:12px">Get 1 extra free delivery!</div>
-      <input id="referral-input" class="inp" type="text" placeholder="Enter code (optional)" style="text-align:center;text-transform:uppercase;font-weight:700;letter-spacing:2px;margin-bottom:8px"/>
-      <div id="referral-msg" style="display:none;font-size:12px;font-weight:700;margin-bottom:8px"></div>
-      <button class="btn btn-primary" onclick="applyReferralAndFinish()" style="margin-bottom:6px">Continue →</button>
-      <button onclick="applyReferralAndFinish()" style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;font-family:inherit">Skip</button>
-    </div>
-
-    <!-- Google Sign In button -->
-    <div id="step-google">
-      <button onclick="signInWithGoogle()" style="display:flex;align-items:center;justify-content:center;gap:12px;width:100%;background:#fff;border:2px solid #e8edf5;border-radius:12px;padding:14px 20px;font-size:15px;font-weight:700;color:#374151;cursor:pointer;font-family:inherit;transition:.2s;box-shadow:0 2px 8px rgba(0,0,0,.08)" onmouseover="this.style.borderColor='#4285f4';this.style.background='#f8f9ff'" onmouseout="this.style.borderColor='#e8edf5';this.style.background='#fff'">
-        <img src="https://www.google.com/favicon.ico" style="width:20px;height:20px"/>
-        Continue with Google
-      </button>
-      <div id="login-error" style="display:none;color:#ef4444;font-size:12px;font-weight:700;margin-top:10px"></div>
-    </div>
-
-    <div style="font-size:11px;color:#9ca3af;margin-top:16px">✅ Sign in once — remembered on this device</div>
-  </div>
-</div>
-
 <!-- ── ADMIN LOGIN MODAL ── -->
 <div id="admin-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:999;align-items:center;justify-content:center">
   <div style="background:#fff;border-radius:16px;padding:28px 24px;width:320px;max-width:90vw;box-shadow:0 20px 60px rgba(0,0,0,.3)">
