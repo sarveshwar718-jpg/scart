@@ -443,23 +443,12 @@ const BASE_PRODUCTS = [
   {id:26,name:"Ziggy Choco Star",price:20,mrp:20,cat:"Grocery",brand:"Ziggy",rating:4.4,reviews:105,img:"⭐",imgUrl:"https://i.ibb.co/tT0k1VJR/Screenshot-20260421-160326-Google.jpg",badge:null,seller:"Scart Seller",sellerRating:4.5},
 ];
 
-// Load products from localStorage (admin changes) merged with base products
-function loadSavedProducts() {
-  try {
-    const saved = localStorage.getItem('scart_products');
-    if(saved) return JSON.parse(saved);
-  } catch(e) {}
-  return null;
-}
-
+// Firebase is the source of truth for products — localStorage no longer used
 function saveProductsToStorage() {
-  try {
-    localStorage.setItem('scart_products', JSON.stringify(PRODUCTS));
-  } catch(e) {}
+  // Deprecated: Firebase is now the source of truth. No-op kept for safety.
 }
 
-const savedProds = loadSavedProducts();
-const PRODUCTS = savedProds ? savedProds : [...BASE_PRODUCTS];
+const PRODUCTS = [...BASE_PRODUCTS];
 
 // ── ORDER HISTORY ─────────────────────────────────────────────────────────
 // Orders stored per user in localStorage — no shared fake history
@@ -1517,16 +1506,16 @@ async function loadProductsFromFirebase() {
   if(!db) return;
   try {
     const snap = await db.collection('products').get();
-    if(snap.empty) return;
-    snap.forEach(doc => {
-      const p = doc.data();
-      if(!PRODUCTS.find(x => x.id === p.id)) {
-        PRODUCTS.push(p);
-      } else {
-        const idx = PRODUCTS.findIndex(x => x.id === p.id);
-        PRODUCTS[idx] = p;
-      }
-    });
+    if(!snap.empty) {
+      // Firebase is source of truth — fully rebuild PRODUCTS from Firebase
+      const firebaseProds = [];
+      snap.forEach(doc => firebaseProds.push(doc.data()));
+      // Keep base products that haven't been touched in Firebase, override the rest
+      const fbIds = new Set(firebaseProds.map(p => p.id));
+      PRODUCTS.length = 0;
+      BASE_PRODUCTS.forEach(p => { if(!fbIds.has(p.id)) PRODUCTS.push(p); });
+      firebaseProds.forEach(p => PRODUCTS.push(p));
+    }
     renderHome();
     renderListing();
   } catch(e) { console.error('Load products error:', e); }
@@ -1547,20 +1536,23 @@ async function loadProductsFromFirebase() {
   }
 })();
 
-// Firebase auth state — confirm login in background
+// Firebase auth state — ALWAYS sync from Firebase (source of truth)
 try {
   firebase.auth().onAuthStateChanged(async function(user) {
     if(user) {
-      // Load from Firebase for cross-device sync
       const firebaseData = await loadUserFromFirebase(user.uid);
       if(firebaseData) {
+        // Firebase is source of truth — always override local
         currentUser = firebaseData;
+        localStorage.setItem('scart_user_'+user.uid, JSON.stringify(firebaseData));
+        localStorage.setItem('scart_last_uid', user.uid);
         document.getElementById('login-modal').style.display = 'none';
         updateAccountHeader();
       } else {
         const localData = getUserData(user.uid);
         if(localData) {
           currentUser = localData;
+          saveUserData(user.uid, localData); // push to Firebase
           document.getElementById('login-modal').style.display = 'none';
           updateAccountHeader();
         } else {
