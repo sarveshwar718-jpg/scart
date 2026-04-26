@@ -817,16 +817,31 @@ function renderCart() {
 }
 
 function saveCustomerInfo() {
-  const name  = document.getElementById('cust-name').value.trim();
-  const phone = document.getElementById('cust-phone').value.trim();
-  const addr1 = document.getElementById('cust-addr1').value.trim();
-  const addr2 = document.getElementById('cust-addr2').value.trim();
-  const city  = document.getElementById('cust-city').value.trim();
-  const pin   = document.getElementById('cust-pin').value.trim();
-  if(!name || !phone || !addr1 || !city || !pin) {
-    showToast('⚠️ Please fill all required fields');
-    return;
+  const get = (id) => document.getElementById(id) || document.querySelector('#'+id);
+  const nameEl  = get('cust-name');
+  const phoneEl = get('cust-phone');
+  const addr1El = get('cust-addr1');
+  const addr2El = get('cust-addr2');
+  const cityEl  = get('cust-city');
+  const pinEl   = get('cust-pin');
+
+  if(!nameEl || !phoneEl || !addr1El || !cityEl || !pinEl) {
+    showToast('⚠️ Please scroll up and fill the form'); return;
   }
+
+  const name  = nameEl.value.trim();
+  const phone = phoneEl.value.trim();
+  const addr1 = addr1El.value.trim();
+  const addr2 = addr2El ? addr2El.value.trim() : '';
+  const city  = cityEl.value.trim();
+  const pin   = pinEl.value.trim();
+
+  if(!name)  { showToast('⚠️ Enter your full name'); nameEl.focus(); return; }
+  if(!phone) { showToast('⚠️ Enter your phone number'); phoneEl.focus(); return; }
+  if(!addr1) { showToast('⚠️ Enter your address'); addr1El.focus(); return; }
+  if(!city)  { showToast('⚠️ Enter your city'); cityEl.focus(); return; }
+  if(!pin)   { showToast('⚠️ Enter PIN code'); pinEl.focus(); return; }
+
   customerInfo = {name, phone, addr1, addr2, city, pin};
   checkoutStep = 2;
   renderCheckout();
@@ -847,27 +862,21 @@ function renderCheckout() {
   if(checkoutStep===1) form=`
     <div class="summary-box">
       <div style="font-weight:700;font-size:15px;margin-bottom:14px">📍 Delivery Address</div>
-      <input class="inp" id="cust-name" placeholder="Full Name *" value="${customerInfo.name||''}"/>
-      <input class="inp" id="cust-phone" placeholder="Phone Number *" type="tel" value="${customerInfo.phone||''}"/>
-      <input class="inp" id="cust-addr1" placeholder="Address Line 1 *" value="${customerInfo.addr1||''}"/>
-      <input class="inp" id="cust-addr2" placeholder="Address Line 2 (optional)" value="${customerInfo.addr2||''}"/>
+      <input class="inp" id="cust-name" placeholder="Full Name *" value="${customerInfo.name||''}" oninput="customerInfo.name=this.value"/>
+      <input class="inp" id="cust-phone" placeholder="Phone Number *" type="tel" value="${customerInfo.phone||''}" oninput="customerInfo.phone=this.value"/>
+      <input class="inp" id="cust-addr1" placeholder="House No / Street *" value="${customerInfo.addr1||''}" oninput="customerInfo.addr1=this.value"/>
+      <input class="inp" id="cust-addr2" placeholder="Landmark (optional)" value="${customerInfo.addr2||''}" oninput="customerInfo.addr2=this.value"/>
       <div style="display:flex;gap:8px">
-        <input class="inp" id="cust-city" placeholder="City *" style="flex:1" value="${customerInfo.city||''}"/>
-        <input class="inp" id="cust-pin" placeholder="PIN Code *" style="flex:1" value="${customerInfo.pin||''}"/>
+        <input class="inp" id="cust-city" placeholder="City *" style="flex:1" value="${customerInfo.city||''}" oninput="customerInfo.city=this.value"/>
+        <input class="inp" id="cust-pin" placeholder="PIN Code *" style="flex:1" value="${customerInfo.pin||''}" oninput="customerInfo.pin=this.value"/>
+      </div>
+      <div style="background:#ecfdf5;border:1px solid #6ee7b7;border-radius:8px;padding:12px;margin-bottom:12px;font-size:13px;color:#065f46;font-weight:600">
+        💵 Payment: Cash on Delivery only
       </div>
       <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:12px;margin-bottom:12px;font-size:13px">
         <strong>Delivery Slot:</strong> ${slotLabel}
       </div>
-      <button class="btn btn-primary" onclick="saveCustomerInfo()">Continue to Payment →</button>
-    </div>`;
-  else if(checkoutStep===2) form=`
-    <div class="summary-box">
-      <div style="font-weight:700;font-size:15px;margin-bottom:14px">💳 Payment Method</div>
-      ${[['💳','Credit / Debit Card'],['📱','UPI (Google Pay, PhonePe)'],['💵','Cash on Delivery']].map(([ic,lb])=>`
-        <div style="display:flex;align-items:center;gap:12px;padding:14px;border:1.5px solid var(--border);border-radius:10px;margin-bottom:10px;cursor:pointer" onclick="this.style.borderColor='var(--blue)'">
-          <span style="font-size:22px">${ic}</span><span style="font-weight:600;font-size:14px">${lb}</span>
-        </div>`).join('')}
-      <button class="btn btn-primary" onclick="checkoutStep=3;renderCheckout()">Continue to Review →</button>
+      <button class="btn btn-primary" onclick="saveCustomerInfo()">Continue to Review →</button>
     </div>`;
   else form=`
     <div class="summary-box">
@@ -879,8 +888,9 @@ function renderCheckout() {
       </div>
       ${cartItems().map(({p,q})=>`<div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:13px"><span>${p.img} ${p.name} × ${q}</span><strong>₹${p.price*q}</strong></div>`).join('')}
       <div style="border-top:1px solid var(--border);margin-top:10px;padding-top:10px">
+        <div class="sum-row"><span>Payment</span><span style="font-weight:700;color:var(--green)">💵 Cash on Delivery</span></div>
         <div class="sum-row"><span>Delivery Slot</span><span style="font-weight:700;color:var(--blue)">${slotLabel}</span></div>
-        <div class="sum-row"><span>Delivery Fee</span><span style="color:${fee===0?'var(--green)':'#374151'}">₹${fee===0?'FREE':fee}</span></div>
+        <div class="sum-row"><span>Delivery Fee</span><span style="color:${fee===0?'var(--green)':'#374151'}">${fee===0?'FREE':'₹'+fee}</span></div>
         <div style="display:flex;justify-content:space-between;font-size:16px;font-weight:800"><span>Total</span><span>₹${tot}</span></div>
       </div>
       <button class="btn btn-secondary" style="margin-top:12px" onclick="placeOrder()">✅ Place Order</button>
@@ -890,9 +900,7 @@ function renderCheckout() {
     <div class="step-bar">
       ${stepCircle(1)}<span class="step-label" style="font-weight:${checkoutStep===1?700:400};color:${checkoutStep===1?'var(--navy)':'var(--muted)'}">Address</span>
       <div class="step-line" style="background:${checkoutStep>1?'var(--green)':'var(--border)'}"></div>
-      ${stepCircle(2)}<span class="step-label" style="font-weight:${checkoutStep===2?700:400};color:${checkoutStep===2?'var(--navy)':'var(--muted)'}">Payment</span>
-      <div class="step-line" style="background:${checkoutStep>2?'var(--green)':'var(--border)'}"></div>
-      ${stepCircle(3)}<span class="step-label" style="font-weight:${checkoutStep===3?700:400};color:${checkoutStep===3?'var(--navy)':'var(--muted)'}">Review</span>
+      ${stepCircle(2)}<span class="step-label" style="font-weight:${checkoutStep===2?700:400};color:${checkoutStep===2?'var(--navy)':'var(--muted)'}">Review</span>
     </div>
     <div style="display:flex;gap:20px;flex-wrap:wrap">
       <div style="flex:1;min-width:280px">${form}</div>
