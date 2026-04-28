@@ -415,9 +415,7 @@ input,select{font-family:inherit}
 <script>
 // ── DATA ──────────────────────────────────────────────────────────────────
 const BASE_PRODUCTS = [
-  {id:1,name:"Kurkure (10 Pack)",price:10,mrp:10,cat:"Grocery",brand:"PepsiCo",rating:4.2,reviews:341,img:"🌽",imgUrl:"https://i.ibb.co/cKQ19Q98/71-Ly-Klizpu-L-AC-UF894-1000-QL80.jpg",badge:null,seller:"Scart Seller",sellerRating:4.5},
   {id:2,name:"Xo Pen",price:10,mrp:10,cat:"Stationery",brand:"Xo",rating:4.0,reviews:80,img:"🖊️",imgUrl:"https://i.ibb.co/CKXYCpvM/IMG-20260420-WA0095.jpg",badge:null,seller:"Scart Seller",sellerRating:4.5},
-  {id:3,name:"Puffcorn",price:10,mrp:10,cat:"Grocery",brand:"PepsiCo",rating:4.1,reviews:150,img:"🍿",imgUrl:"https://i.ibb.co/xqDFdBNY/81w-JJZZ7-Xu-L.jpg",badge:null,seller:"Scart Seller",sellerRating:4.5},
   {id:4,name:"Buttermilk",price:10,mrp:10,cat:"Dairy",brand:"Local",rating:4.3,reviews:95,img:"🥤",imgUrl:"https://i.ibb.co/q3QnKprt/IMG-20260420-WA0082.jpg",badge:null,seller:"Scart Seller",sellerRating:4.5},
   {id:5,name:"A4 Sheet",price:2,mrp:2,cat:"Stationery",brand:"JK",rating:4.0,reviews:112,img:"📄",imgUrl:"https://i.ibb.co/8nM4ppF8/Screenshot-20260419-011523-Google.jpg",badge:"Best Value",seller:"Scart Seller",sellerRating:4.5},
   {id:6,name:"Snickers",price:10,mrp:10,cat:"Grocery",brand:"Mars",rating:4.6,reviews:280,img:"🍫",imgUrl:"https://i.ibb.co/gbQJRKgB/IMG-20260420-WA0096.jpg",badge:null,seller:"Scart Seller",sellerRating:4.5},
@@ -426,21 +424,11 @@ const BASE_PRODUCTS = [
   {id:9,name:"Meera Shampoo",price:2,mrp:2,cat:"Home",brand:"Meera",rating:4.3,reviews:175,img:"🧴",imgUrl:"https://i.ibb.co/4Dhf4qJ/Screenshot-20260419-003204-Google.jpg",badge:null,seller:"Scart Seller",sellerRating:4.5},
   {id:10,name:"Sunrises Coffee",price:5,mrp:5,cat:"Beverages",brand:"Sunrises",rating:4.4,reviews:210,img:"☕",imgUrl:"https://i.ibb.co/bjz41kLk/63.jpg",badge:null,seller:"Scart Seller",sellerRating:4.5},
   {id:11,name:"Arokya Curd",price:10,mrp:10,cat:"Dairy",brand:"Arokya",rating:4.5,reviews:190,img:"🫙",imgUrl:"https://i.ibb.co/qFF90tSv/750-large-default.jpg",badge:null,seller:"Scart Seller",sellerRating:4.5},
-  {id:12,name:"Kurkure Green Style",price:20,mrp:20,cat:"Grocery",brand:"PepsiCo",rating:4.3,reviews:120,img:"🌿",imgUrl:"https://i.ibb.co/v4RPTpG8/Kurkure-Namkeen-Green-Chutney-Rajasthani-Style-70-g-1.webp",badge:null,seller:"Scart Seller",sellerRating:4.5},
-  {id:13,name:"Lays Blue",price:10,mrp:10,cat:"Grocery",brand:"PepsiCo",rating:4.4,reviews:562,img:"🥔",imgUrl:"https://i.ibb.co/nNFKm0wS/71-Ge9n3gm-YL.jpg",badge:null,seller:"Scart Seller",sellerRating:4.5},
-  {id:14,name:"Lays Red",price:10,mrp:10,cat:"Grocery",brand:"PepsiCo",rating:4.4,reviews:430,img:"🌶️",imgUrl:"https://i.ibb.co/wF2V6sxK/718m-Ikrm-Cf-L-AC-UF894-1000-QL80.jpg",badge:null,seller:"Scart Seller",sellerRating:4.5},
-  {id:15,name:"Kurkure Original",price:20,mrp:20,cat:"Grocery",brand:"PepsiCo",rating:4.2,reviews:310,img:"🌽",imgUrl:"https://i.ibb.co/cKQ19Q98/71-Ly-Klizpu-L-AC-UF894-1000-QL80.jpg",badge:"Top Pick",seller:"Scart Seller",sellerRating:4.5},
-  {id:16,name:"Puffcorn Plain",price:10,mrp:10,cat:"Grocery",brand:"PepsiCo",rating:4.1,reviews:140,img:"🍿",imgUrl:"https://i.ibb.co/xqDFdBNY/81w-JJZZ7-Xu-L.jpg",badge:null,seller:"Scart Seller",sellerRating:4.5},
   {id:17,name:"Rin Soap",price:10,mrp:10,cat:"Home",brand:"HUL",rating:4.2,reviews:156,img:"🧼",imgUrl:"https://i.ibb.co/PZwkjLGX/Screenshot-20260420-191524-Google.jpg",badge:null,seller:"Scart Seller",sellerRating:4.5},
   {id:18,name:"KitKat Pops",price:50,mrp:50,cat:"Grocery",brand:"Nestle",rating:4.7,reviews:320,img:"🍫",imgUrl:"https://i.ibb.co/bj4v3Hmt/Screenshot-20260420-190044-Google.jpg",badge:"Top Pick",seller:"Scart Seller",sellerRating:4.5},
   {id:19,name:"Fab",price:99,mrp:99,cat:"Home",brand:"Fab",rating:4.3,reviews:88,img:"🧹",imgUrl:"https://i.ibb.co/CDcN1tX/Screenshot-20260420-192656-Google.jpg",badge:null,seller:"Scart Seller",sellerRating:4.5},
-  {id:20,name:"Maggi Saver",price:56,mrp:56,cat:"Grocery",brand:"Nestle",rating:4.8,reviews:450,img:"🍜",imgUrl:"https://i.ibb.co/3YCWqjz1/1776693125570.png",badge:"Best Value",seller:"Scart Seller",sellerRating:4.5},
-  {id:21,name:"Maggi Mega Saver",price:83,mrp:83,cat:"Grocery",brand:"Nestle",rating:4.8,reviews:380,img:"🍜",imgUrl:"https://i.ibb.co/GfM7p9DH/1776748540570.png",badge:"Top Pick",seller:"Scart Seller",sellerRating:4.5},
   {id:22,name:"Feast Ice Cream",price:60,mrp:60,cat:"Grocery",brand:"HUL",rating:4.7,reviews:290,img:"🍦",imgUrl:"https://i.ibb.co/35Dw6gPV/1776693085546.png",badge:"Top Pick",seller:"Scart Seller",sellerRating:4.5},
   {id:23,name:"Cake Time",price:5,mrp:5,cat:"Grocery",brand:"Britannia",rating:4.0,reviews:160,img:"🎂",imgUrl:"https://i.ibb.co/35Dw6gPV/1776693085546.png",badge:null,seller:"Scart Seller",sellerRating:4.5},
-  {id:24,name:"Winkies Vanilla Cream",price:10,mrp:10,cat:"Grocery",brand:"Winkies",rating:4.1,reviews:110,img:"🍰",imgUrl:"https://i.ibb.co/xSVj0hgp/81-Aq6-WQn-I1-L.jpg",badge:null,seller:"Scart Seller",sellerRating:4.5},
-  {id:25,name:"Ziggy Donut Cake",price:20,mrp:20,cat:"Grocery",brand:"Ziggy",rating:4.3,reviews:95,img:"🍩",imgUrl:"https://i.ibb.co/KRHVx7k/Screenshot-20260421-160305-Google.jpg",badge:null,seller:"Scart Seller",sellerRating:4.5},
-  {id:26,name:"Ziggy Choco Star",price:20,mrp:20,cat:"Grocery",brand:"Ziggy",rating:4.4,reviews:105,img:"⭐",imgUrl:"https://i.ibb.co/tT0k1VJR/Screenshot-20260421-160326-Google.jpg",badge:null,seller:"Scart Seller",sellerRating:4.5},
 ];
 
 // Firebase is the source of truth for products — localStorage no longer used
