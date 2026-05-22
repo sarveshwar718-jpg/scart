@@ -1,26 +1,94 @@
 {
+  "id": "in.co.scart",
   "name": "Scart – Shop Smart",
   "short_name": "Scart",
-  "description": "Quality Products, Reliable Delivery",
+  "description": "Quality Products, Reliable Delivery — Order groceries, stationery, dairy and more from Scart.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
   "background_color": "#f4f6fb",
   "theme_color": "#1a3a6b",
   "orientation": "portrait",
+  "dir": "ltr",
+  "lang": "en-IN",
+  "categories": ["shopping", "food"],
+  "iarc_rating_id": "e84b072d-71b3-4d3e-86ae-31a8ce4e53b7",
   "icons": [
+    {
+      "src": "https://i.ibb.co/35Dw6gPV/1776693085546.png",
+      "sizes": "48x48",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://i.ibb.co/35Dw6gPV/1776693085546.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://i.ibb.co/35Dw6gPV/1776693085546.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://i.ibb.co/35Dw6gPV/1776693085546.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
     {
       "src": "https://i.ibb.co/35Dw6gPV/1776693085546.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "https://i.ibb.co/35Dw6gPV/1776693085546.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "https://i.ibb.co/35Dw6gPV/1776693085546.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
-  "categories": ["shopping", "food"],
-  "lang": "en-IN"
+  "screenshots": [
+    {
+      "src": "https://i.ibb.co/35Dw6gPV/1776693085546.png",
+      "sizes": "540x720",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Scart Home Screen"
+    },
+    {
+      "src": "https://i.ibb.co/35Dw6gPV/1776693085546.png",
+      "sizes": "540x720",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Scart Shop"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Shop Now",
+      "short_name": "Shop",
+      "description": "Browse all products",
+      "url": "/?tab=listing",
+      "icons": [{ "src": "https://i.ibb.co/35Dw6gPV/1776693085546.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "My Orders",
+      "short_name": "Orders",
+      "description": "View your orders",
+      "url": "/?tab=orders",
+      "icons": [{ "src": "https://i.ibb.co/35Dw6gPV/1776693085546.png", "sizes": "192x192" }]
+    }
+  ],
+  "prefer_related_applications": false
 }
