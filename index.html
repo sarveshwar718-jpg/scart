@@ -188,6 +188,203 @@ input,select{font-family:inherit}
   .prod-img-box{flex:none!important;width:100%}
   .listing-layout{flex-direction:column!important}
 }
+
+/* ── AI CHATBOT ── */
+@keyframes botPulse{0%,100%{box-shadow:0 0 0 0 rgba(37,99,235,.4)}70%{box-shadow:0 0 0 10px rgba(37,99,235,0)}}
+@keyframes floatIn{from{opacity:0;transform:translateY(14px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes dotBounce{0%,80%,100%{transform:scale(0)}40%{transform:scale(1)}}
+@keyframes cardEntrance{from{opacity:0;transform:perspective(600px) rotateX(-12deg) translateY(20px)}to{opacity:1;transform:perspective(600px) rotateX(0deg) translateY(0)}}
+@keyframes glowPulse{0%,100%{opacity:.6}50%{opacity:1}}
+
+.ai-chat-wrapper{
+  perspective:1000px;
+  animation:cardEntrance .5s cubic-bezier(.22,1,.36,1) forwards;
+}
+.ai-chat-card{
+  background:linear-gradient(145deg,#0f172a 0%,#1e3a8a 50%,#1a3a6b 100%);
+  border-radius:20px;
+  overflow:hidden;
+  box-shadow:0 24px 60px rgba(15,23,42,.45),0 0 0 1px rgba(255,255,255,.08),inset 0 1px 0 rgba(255,255,255,.12);
+  transform-style:preserve-3d;
+  transition:transform .3s ease,box-shadow .3s ease;
+  position:relative;
+}
+.ai-chat-card::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:radial-gradient(ellipse at 30% -20%,rgba(96,165,250,.18) 0%,transparent 60%),
+             radial-gradient(ellipse at 80% 120%,rgba(245,158,11,.1) 0%,transparent 50%);
+  pointer-events:none;
+  z-index:0;
+}
+.ai-chat-header{
+  padding:16px 18px 14px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  position:relative;
+  z-index:1;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.ai-avatar-ring{
+  position:relative;
+  width:44px;height:44px;flex-shrink:0;
+}
+.ai-avatar-ring::before{
+  content:'';
+  position:absolute;
+  inset:-3px;
+  border-radius:50%;
+  background:conic-gradient(#3b82f6,#f59e0b,#3b82f6);
+  animation:spin 3s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ai-avatar-inner{
+  position:relative;z-index:1;
+  width:44px;height:44px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#1d4ed8,#1a3a6b);
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;
+  border:2px solid #0f172a;
+}
+.ai-status-dot{
+  width:9px;height:9px;
+  border-radius:50%;
+  background:#22c55e;
+  position:absolute;bottom:1px;right:1px;
+  border:2px solid #0f172a;
+  animation:botPulse 2s infinite;
+}
+.ai-header-text{color:#fff}
+.ai-header-text .name{font-weight:800;font-size:15px;letter-spacing:-.2px}
+.ai-header-text .status{font-size:11px;color:#93c5fd;display:flex;align-items:center;gap:5px}
+
+.ai-messages{
+  height:320px;
+  overflow-y:auto;
+  padding:16px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  position:relative;z-index:1;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(255,255,255,.15) transparent;
+}
+.ai-messages::-webkit-scrollbar{width:4px}
+.ai-messages::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:4px}
+
+.msg-bubble{
+  max-width:82%;
+  padding:10px 14px;
+  border-radius:16px;
+  font-size:13.5px;
+  line-height:1.55;
+  animation:floatIn .25s ease forwards;
+  position:relative;
+}
+.msg-bot{
+  background:rgba(255,255,255,.1);
+  color:#e2e8f0;
+  align-self:flex-start;
+  border-bottom-left-radius:4px;
+  backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,.08);
+}
+.msg-user{
+  background:linear-gradient(135deg,#2563eb,#1d4ed8);
+  color:#fff;
+  align-self:flex-end;
+  border-bottom-right-radius:4px;
+  box-shadow:0 4px 12px rgba(37,99,235,.35);
+}
+.msg-time{font-size:10px;opacity:.5;margin-top:4px;display:block}
+
+.typing-indicator{
+  display:flex;align-items:center;gap:5px;
+  padding:10px 14px;
+  background:rgba(255,255,255,.08);
+  border-radius:16px;border-bottom-left-radius:4px;
+  align-self:flex-start;
+  backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,.08);
+}
+.typing-indicator span{
+  width:7px;height:7px;
+  border-radius:50%;
+  background:#93c5fd;
+  display:inline-block;
+  animation:dotBounce 1.2s infinite ease-in-out;
+}
+.typing-indicator span:nth-child(1){animation-delay:0s}
+.typing-indicator span:nth-child(2){animation-delay:.16s}
+.typing-indicator span:nth-child(3){animation-delay:.32s}
+
+.ai-input-bar{
+  display:flex;
+  gap:8px;
+  padding:12px 14px;
+  background:rgba(0,0,0,.25);
+  position:relative;z-index:1;
+  border-top:1px solid rgba(255,255,255,.07);
+}
+.ai-input{
+  flex:1;
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:12px;
+  padding:10px 14px;
+  font-size:13px;
+  color:#fff;
+  outline:none;
+  font-family:inherit;
+  transition:border-color .2s,background .2s;
+}
+.ai-input::placeholder{color:rgba(255,255,255,.35)}
+.ai-input:focus{border-color:rgba(59,130,246,.6);background:rgba(255,255,255,.12)}
+.ai-send-btn{
+  width:42px;height:42px;flex-shrink:0;
+  background:linear-gradient(135deg,#2563eb,#1d4ed8);
+  border:none;border-radius:12px;
+  color:#fff;font-size:17px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .15s,box-shadow .15s;
+  box-shadow:0 4px 14px rgba(37,99,235,.4);
+}
+.ai-send-btn:hover{transform:scale(1.08);box-shadow:0 6px 20px rgba(37,99,235,.5)}
+.ai-send-btn:active{transform:scale(.95)}
+.ai-send-btn:disabled{opacity:.4;cursor:default;transform:none}
+
+.ai-quick-chips{
+  display:flex;gap:6px;flex-wrap:wrap;
+  padding:0 14px 10px;
+  position:relative;z-index:1;
+}
+.ai-chip{
+  background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:20px;
+  padding:5px 12px;
+  font-size:11.5px;
+  color:#cbd5e1;
+  cursor:pointer;
+  font-family:inherit;
+  transition:all .2s;
+  white-space:nowrap;
+}
+.ai-chip:hover{background:rgba(59,130,246,.25);border-color:#3b82f6;color:#fff}
+
+.ai-trust-strip{
+  background:rgba(5,150,105,.15);
+  border-top:1px solid rgba(5,150,105,.2);
+  padding:10px 16px;
+  font-size:12px;
+  color:#6ee7b7;
+  text-align:center;
+  position:relative;z-index:1;
+}
 </style>
 </head>
 <body>
@@ -1082,19 +1279,38 @@ function renderAccount() {
       <button class="btn btn-outline" style="border-style:dashed">+ Add New Address</button>
     </div>`;
   } else {
-    html=`<div class="summary-box">
-      <div style="font-weight:700;font-size:15px;margin-bottom:16px">💬 Customer Support</div>
-      ${[['📧','Email Support','support@scart.in','We reply within 24 hours'],['💬','Live Chat','Available 9 AM – 9 PM','Start a chat now']].map(([ic,t,s,a])=>`
-        <div style="display:flex;gap:14px;align-items:center;padding:14px;background:#f8fafc;border-radius:10px;margin-bottom:10px">
-          <span style="font-size:24px">${ic}</span>
-          <div style="flex:1"><div style="font-weight:700;font-size:14px">${t}</div><div style="font-size:12px;color:var(--muted)">${s}</div></div>
-          <span style="font-size:12px;color:var(--blue);font-weight:600">${a} →</span>
-        </div>`).join('')}
-      <div style="background:#ecfdf5;border:1px solid #6ee7b7;border-radius:10px;padding:14px;margin-top:8px">
-        <div style="font-weight:700;color:#065f46;margin-bottom:4px">✅ Verified Products</div>
-        <div style="font-size:13px;color:#047857">All products on Scart are verified for authenticity. Shop with confidence!</div>
+    html=`<div class="ai-chat-wrapper">
+      <div class="ai-chat-card">
+        <div class="ai-chat-header">
+          <div class="ai-avatar-ring">
+            <div class="ai-avatar-inner">🤖<div class="ai-status-dot"></div></div>
+          </div>
+          <div class="ai-header-text">
+            <div class="name">Scart Assistant</div>
+            <div class="status"><span style="width:6px;height:6px;background:#22c55e;border-radius:50%;display:inline-block"></span>Online &middot; AI-powered</div>
+          </div>
+          <div style="margin-left:auto;font-size:11px;color:rgba(255,255,255,.4);text-align:right;line-height:1.4">Powered by<br/><span style="color:#93c5fd;font-weight:700">Claude AI</span></div>
+        </div>
+        <div class="ai-messages" id="ai-msg-list">
+          <div class="msg-bubble msg-bot">
+            Hi! I am your Scart assistant. I can help you with orders, products, delivery, and returns.<br/><br/>What can I help you with today?
+            <span class="msg-time">Just now</span>
+          </div>
+        </div>
+        <div class="ai-quick-chips" id="ai-chips">
+          <button class="ai-chip" onclick="sendChip(this,'Track my order')">Track order</button>
+          <button class="ai-chip" onclick="sendChip(this,'Delivery timings')">Delivery info</button>
+          <button class="ai-chip" onclick="sendChip(this,'Return policy')">Returns</button>
+          <button class="ai-chip" onclick="sendChip(this,'Payment methods')">Payments</button>
+        </div>
+        <div class="ai-input-bar">
+          <input class="ai-input" id="ai-input" type="text" placeholder="Ask me anything about Scart..." onkeydown="if(event.key==='Enter')sendAIMessage()"/>
+          <button class="ai-send-btn" id="ai-send-btn" onclick="sendAIMessage()">&#10148;</button>
+        </div>
+        <div class="ai-trust-strip">All products verified &middot; Secure checkout &middot; 100% authentic</div>
       </div>
     </div>`;
+    setTimeout(initAIChat, 0);
   }
   document.getElementById('acc-content').innerHTML=html;
 }
@@ -1548,6 +1764,109 @@ document.getElementById('hero-search').addEventListener('input', function() {
 document.getElementById('hero-search').addEventListener('keydown',e=>{if(e.key==='Enter')doSearch();});
 renderHome();
 loadProductsFromFirebase();
+
+// ── AI CHATBOT ────────────────────────────────────────────────────────────
+const AI_SYSTEM = `You are a helpful, friendly customer support assistant for Scart — a quick-commerce grocery delivery app in India. 
+Scart delivers groceries, dairy, beverages, home essentials, and stationery.
+Key facts:
+- Delivery: Same day if order placed before 6 PM (7–9 PM slot), else next day
+- Delivery fee: FREE for first 2 orders, then ₹10; FREE on orders above ₹300
+- Payment: Online payment via UPI, cards, wallets
+- Returns: Contact within 24 hours of delivery for any issues
+- Referral: Users get referral codes; each code gives 1 extra free delivery
+- Products are 100% authentic and verified
+- Orders tracked by Order ID starting with SCT
+- Support: This AI chat is the primary support channel
+Keep replies concise (2–4 sentences max), warm, and helpful. Use emojis sparingly. Answer in the same language the user writes in.`;
+
+let aiHistory = [];
+let aiTyping = false;
+
+function initAIChat() {
+  aiHistory = [];
+}
+
+function addMsg(role, text) {
+  const list = document.getElementById('ai-msg-list');
+  if (!list) return;
+  const now = new Date().toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
+  const div = document.createElement('div');
+  div.className = 'msg-bubble ' + (role === 'user' ? 'msg-user' : 'msg-bot');
+  div.innerHTML = text.replace(/\n/g, '<br/>') + '<span class="msg-time">' + now + '</span>';
+  list.appendChild(div);
+  list.scrollTop = list.scrollHeight;
+}
+
+function showTyping() {
+  const list = document.getElementById('ai-msg-list');
+  if (!list) return null;
+  const el = document.createElement('div');
+  el.className = 'typing-indicator';
+  el.id = 'ai-typing';
+  el.innerHTML = '<span></span><span></span><span></span>';
+  list.appendChild(el);
+  list.scrollTop = list.scrollHeight;
+  return el;
+}
+
+function removeTyping() {
+  const el = document.getElementById('ai-typing');
+  if (el) el.remove();
+}
+
+function sendChip(btn, text) {
+  // Hide chips after first use
+  const chips = document.getElementById('ai-chips');
+  if (chips) chips.style.display = 'none';
+  const input = document.getElementById('ai-input');
+  if (input) input.value = text;
+  sendAIMessage();
+}
+
+async function sendAIMessage() {
+  const input = document.getElementById('ai-input');
+  const sendBtn = document.getElementById('ai-send-btn');
+  if (!input || aiTyping) return;
+  const text = input.value.trim();
+  if (!text) return;
+
+  input.value = '';
+  aiHistory.push({ role: 'user', content: text });
+  addMsg('user', text);
+
+  // Hide quick chips once user starts typing
+  const chips = document.getElementById('ai-chips');
+  if (chips) chips.style.display = 'none';
+
+  aiTyping = true;
+  if (sendBtn) sendBtn.disabled = true;
+  showTyping();
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: AI_SYSTEM,
+        messages: aiHistory
+      })
+    });
+    const data = await res.json();
+    const reply = data.content && data.content[0] ? data.content[0].text : 'Sorry, I could not get a response. Please try again.';
+    aiHistory.push({ role: 'assistant', content: reply });
+    removeTyping();
+    addMsg('bot', reply);
+  } catch (e) {
+    removeTyping();
+    addMsg('bot', 'Oops! Something went wrong. Please try again in a moment.');
+  }
+
+  aiTyping = false;
+  if (sendBtn) sendBtn.disabled = false;
+  if (input) input.focus();
+}
 
 // ── SERVICE WORKER (PWA) ──────────────────────────────────────────────────
 if('serviceWorker' in navigator) {
