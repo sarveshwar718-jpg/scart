@@ -18,7 +18,7 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --navy:#1a3a6b;--blue:#2563eb;--amber:#f59e0b;
+  --navy:#1a56db;--blue:#2563eb;--amber:#f59e0b;
   --green:#059669;--red:#ef4444;--gray:#f4f6fb;
   --border:#e8edf5;--text:#1a1a2e;--muted:#6b7280;
 }
@@ -28,12 +28,12 @@ input,select{font-family:inherit}
 
 /* ── HEADER ── */
 #header{background:var(--navy);position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,.35)}
-.header-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:12px;height:60px;padding:0 16px}
+.header-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:12px;height:66px;padding:0 16px}
 .logo{font-family:'DM Serif Display',serif;font-size:24px;color:#fff;cursor:pointer;flex-shrink:0;letter-spacing:-.5px}
 .logo span{color:var(--amber)}
-.search-bar{flex:1;display:flex;background:#fff;border-radius:8px;overflow:hidden;border:2px solid var(--blue)}
-.search-bar input{flex:1;border:none;outline:none;padding:8px 14px;font-size:14px;color:var(--text)}
-.search-bar button{background:var(--amber);border:none;padding:0 18px;font-weight:700;color:var(--navy);font-size:15px;transition:.2s}
+.search-bar{flex:1;display:flex;background:#fff;border-radius:10px;overflow:hidden;border:2px solid rgba(255,255,255,.4);box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.search-bar input{flex:1;border:none;outline:none;padding:11px 16px;font-size:15px;color:var(--text)}
+.search-bar button{background:var(--navy);border:none;padding:0 20px;font-weight:700;color:#fff;font-size:16px;transition:.2s}
 .search-bar button:hover{background:#e08d00}
 .hdr-btn{background:none;border:none;color:#fff;font-size:22px;padding:6px;position:relative;transition:.2s}
 .hdr-btn:hover{transform:scale(1.1)}
@@ -49,13 +49,6 @@ input,select{font-family:inherit}
 .page-hidden{display:none!important}
 
 /* ── HERO ── */
-.hero{background:linear-gradient(135deg,var(--navy) 0%,var(--blue) 100%);border-radius:16px;padding:36px 40px;color:#fff;margin-bottom:24px;position:relative;overflow:hidden}
-.hero::after{content:'🛒';position:absolute;right:20px;top:-10px;font-size:140px;opacity:.08;pointer-events:none}
-.hero h1{font-family:'DM Serif Display',serif;font-size:30px;margin-bottom:6px;letter-spacing:-.5px}
-.hero p{font-size:15px;opacity:.85;margin-bottom:18px}
-.hero-search{display:flex;background:#fff;border-radius:10px;overflow:hidden;max-width:600px}
-.hero-search input{flex:1;border:none;outline:none;padding:12px 16px;font-size:15px;color:var(--text)}
-.hero-search button{background:var(--amber);border:none;padding:0 24px;font-weight:700;color:var(--navy);font-size:15px}
 .trust-bar{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}
 .trust-item{display:flex;align-items:center;gap:6px;font-size:12px;background:rgba(255,255,255,.12);border-radius:8px;padding:6px 12px}
 
@@ -507,14 +500,14 @@ input,select{font-family:inherit}
   display: none;
   position: fixed;
   inset: 0;
-  background: #f4f6fb;
+  background: #0f172a;
   z-index: 2000;
   overflow-y: auto;
   font-family: 'DM Sans', sans-serif;
 }
 .dp-topbar {
-  background: #1a3a6b;
-  border-bottom: 1px solid rgba(255,255,255,.15);
+  background: #1e293b;
+  border-bottom: 1px solid rgba(255,255,255,.08);
   padding: 0 20px;
   height: 64px;
   display: flex;
@@ -539,8 +532,8 @@ input,select{font-family:inherit}
 
 /* Online/Offline Toggle */
 .dp-toggle-card {
-  background: #fff;
-  border: 1px solid #e8edf5;
+  background: linear-gradient(135deg,#1e293b,#162032);
+  border: 1px solid rgba(255,255,255,.08);
   border-radius: 20px;
   padding: 20px 24px;
   display: flex;
@@ -550,7 +543,7 @@ input,select{font-family:inherit}
   box-shadow: 0 4px 24px rgba(0,0,0,.3);
 }
 .dp-status-info {}
-.dp-status-label { font-size: 13px; color: #6b7280; margin-bottom: 4px; }
+.dp-status-label { font-size: 13px; color: rgba(255,255,255,.5); margin-bottom: 4px; }
 .dp-status-text { font-size: 20px; font-weight: 800; }
 .dp-status-text.online { color: #22c55e; }
 .dp-status-text.offline { color: #6b7280; }
@@ -585,21 +578,21 @@ input,select{font-family:inherit}
 /* Stats Row */
 .dp-stats-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 20px; }
 .dp-stat-card {
-  background: #fff;
-  border: 1px solid #e8edf5;
+  background: #1e293b;
+  border: 1px solid rgba(255,255,255,.07);
   border-radius: 16px;
   padding: 16px;
   text-align: center;
 }
 .dp-stat-icon { font-size: 22px; margin-bottom: 6px; }
-.dp-stat-val { font-size: 20px; font-weight: 800; color: #1a3a6b; margin-bottom: 2px; }
+.dp-stat-val { font-size: 20px; font-weight: 800; color: #fff; margin-bottom: 2px; }
 .dp-stat-lbl { font-size: 11px; color: rgba(255,255,255,.45); }
 
 /* Tab Nav */
-.dp-tabs { display: flex; background: #e8edf5; border-radius: 14px; border: 1px solid #d1d5db; overflow: hidden; margin-bottom: 20px; }
+.dp-tabs { display: flex; background: #1e293b; border-radius: 14px; border: 1px solid rgba(255,255,255,.07); overflow: hidden; margin-bottom: 20px; }
 .dp-tab {
   flex: 1; padding: 12px 4px; border: none; background: none;
-  font-size: 11px; font-weight: 600; color: rgba(255,255,255,.4);
+  font-size: 11px; font-weight: 600; color: rgba(255,255,255,.5);
   cursor: pointer; transition: all .2s; font-family: inherit;
   display: flex; flex-direction: column; align-items: center; gap: 4px;
 }
@@ -754,11 +747,10 @@ input,select{font-family:inherit}
 <div id="header">
   <div class="header-inner">
     <div class="logo" onclick="nav('home')">S<span>c</span>art</div>
-    <div class="search-bar">
-      <input id="search-input" type="text" placeholder="Search products..."/>
-      <button onclick="doSearch()">🔍</button>
+    <div class="search-bar" style="flex:1;max-width:100%">
+      <input id="search-input" type="text" placeholder="Search for groceries, dairy, beverages..." style="font-size:15px;padding:11px 16px"/>
+      <button onclick="doSearch()" style="padding:0 22px;font-size:16px">🔍</button>
     </div>
-    <button class="hdr-btn" onclick="nav('cart')" style="font-size:26px">🛒<span id="cart-badge" class="cart-badge" style="display:none">0</span></button>
     <button class="hdr-btn" onclick="nav('account')">👤</button>
   </div>
   <div class="subnav">
@@ -809,26 +801,10 @@ input,select{font-family:inherit}
 
 <!-- ── HOME PAGE ── -->
 <div id="page-home" class="page">
-  <div class="hero">
-    <h1>Shop Smart with Scart</h1>
-    <p>Quality Products, Reliable Delivery · Trusted by thousands</p>
-    <input id="hero-search" type="text" style="display:none"/>
-    <div class="trust-bar"></div>
-  </div>
-
-  <div id="home-timer" class="timer-banner" style="display:none">
-    <span style="font-size:20px">⏰</span>
-    <div><strong id="home-timer-text" style="color:#92400e"></strong><span style="color:#78350f;font-size:13px"> for delivery today between 7–9 PM</span></div>
-  </div>
-
-  <div class="sec-title">💙 Best Value</div>
-  <div class="grid" id="home-bestvalue"></div>
+  <input id="hero-search" type="text" style="display:none"/>
+  <div class="sec-title" style="margin-bottom:14px">🛍️ All Products</div>
+  <div class="grid" id="home-all-products"></div>
   <div style="margin-bottom:28px"></div>
-
-  <div class="sec-title">⭐ Top Picks</div>
-  <div class="grid" id="home-toppicks"></div>
-  <div style="margin-bottom:28px"></div>
-
 </div>
 
 <!-- ── LISTING PAGE ── -->
@@ -1181,30 +1157,13 @@ function cardHTML(p) {
 
 // ── HOME ────────────────────────────────────────────────────────────────
 function renderHome() {
-  const h=new Date().getHours(), m=new Date().getMinutes();
-  const toCutoff=18-h-m/60;
-  const timerEl=document.getElementById('home-timer');
-  if(toCutoff>0){
-    const hl=Math.floor(toCutoff), ml=Math.floor((toCutoff-hl)*60);
-    document.getElementById('home-timer-text').textContent=`Order in ${hl}h ${ml}m`;
-    timerEl.style.display='flex';
-  } else {timerEl.style.display='none';}
-
-  // 4 featured products in 2x2 grid
-  const featured = [
-    PRODUCTS.find(p=>p.id===16), // Dairy Milk
-    PRODUCTS.find(p=>p.id===11), // Maggi
-    PRODUCTS.find(p=>p.id===4),  // Ice Cream
-    PRODUCTS.find(p=>p.id===14), // Peanut Butter
-  ].filter(Boolean);
-  document.getElementById('home-featured').innerHTML=featured.map(p=>cardHTML(p)).join('');
-
-  document.getElementById('home-deals').innerHTML=
-    PRODUCTS.filter(p=>p.mrp>p.price).slice(0,6).map(p=>cardHTML(p)).join('');
-  document.getElementById('home-bestvalue').innerHTML=
-    PRODUCTS.filter(p=>p.badge==='Best Value').slice(0,4).map(p=>cardHTML(p)).join('');
-  document.getElementById('home-toppicks').innerHTML=
-    PRODUCTS.filter(p=>p.badge==='Top Pick').slice(0,4).map(p=>cardHTML(p)).join('');
+  const el = document.getElementById('home-all-products');
+  if (!el) return;
+  if (PRODUCTS.length === 0) {
+    el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted);grid-column:1/-1"><div style="font-size:40px;margin-bottom:8px">⏳</div><div>Loading products...</div></div>';
+    return;
+  }
+  el.innerHTML = PRODUCTS.map(p => cardHTML(p)).join('');
 }
 
 // ── LISTING ─────────────────────────────────────────────────────────────
@@ -2372,7 +2331,7 @@ const SCART_KB = [
   { keys:['deliver','timing','slot','time','kab aayega','kitne baje','when'], reply:`We deliver <b>same day between 7–9 PM</b> if you order before 6 PM. Orders placed after 6 PM are delivered the <b>next day</b> in the same slot.` },
   { keys:['delivery charge','delivery fee','free delivery','shipping','charge'], reply:`Delivery is <b>FREE for your first 2 orders</b>! After that it's just ₹10. Orders above ₹300 always get free delivery.` },
   { keys:['return','refund','replace','damaged','broken','wrong item','galat'], reply:`If you receive a damaged, wrong, or missing item, <b>contact us within 24 hours</b> of delivery. Go to Account → Orders, tap the order, and raise a return request.` },
-  { keys:['payment','pay','upi','card','wallet','gpay','phonepe','paytm','cash'], reply:`We accept <b>UPI, Credit/Debit Cards, and Wallets</b> (PhonePe, GPay, Paytm). Cash on delivery is not available. All payments are 100% secure.` },
+  { keys:['payment','pay','upi','card','wallet','gpay','phonepe','paytm','cash','cod'], reply:`We accept <b>UPI, Credit/Debit Cards, Wallets</b> (PhonePe, GPay, Paytm) and <b>Cash on Delivery (COD)</b>. All online payments are 100% secure via Razorpay.` },
   { keys:['referral','refer','code','invite','bonus','friend'], reply:`Share your referral code from <b>Account → Referral</b>. Every friend who joins gives you <b>1 extra free delivery</b>! There's no limit on referrals.` },
   { keys:['cancel','cancellation','cancel order'], reply:`You can cancel an order <b>before it is picked up</b> (usually within 30 mins of placing). Go to Account → Orders → tap your order → Cancel. Refunds are processed in 2–3 business days.` },
   { keys:['product','quality','authentic','original','fake','genuine'], reply:`All products on Scart are <b>100% authentic</b> and sourced directly from verified suppliers. We do not sell expired or duplicate goods.` },
