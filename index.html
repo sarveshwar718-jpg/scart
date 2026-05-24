@@ -388,7 +388,7 @@ input,select{font-family:inherit}
 
 /* ── DELIVERY PARTNER SYSTEM ── */
 :root {
-  --dp-orange: #f97316;
+  --dp-orange: #2563eb;
   --dp-dark: #0f172a;
   --dp-card: #1e293b;
   --dp-border: rgba(255,255,255,.1);
@@ -402,7 +402,7 @@ input,select{font-family:inherit}
   position: absolute;
   top: 16px;
   right: 16px;
-  background: linear-gradient(135deg,#f97316,#ea580c);
+  background: linear-gradient(135deg,#2563eb,#1d4ed8);
   color: #fff;
   border: none;
   border-radius: 10px;
@@ -414,11 +414,11 @@ input,select{font-family:inherit}
   display: flex;
   align-items: center;
   gap: 6px;
-  box-shadow: 0 4px 14px rgba(249,115,22,.35);
+  box-shadow: 0 4px 14px rgba(37,99,235,.35);
   transition: all .2s;
   white-space: nowrap;
 }
-.dp-login-trigger:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(249,115,22,.45); }
+.dp-login-trigger:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(37,99,235,.45); }
 
 /* Delivery Partner Login Modal */
 #dp-login-modal {
@@ -440,7 +440,7 @@ input,select{font-family:inherit}
   box-shadow: 0 30px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.06);
 }
 .dp-login-header {
-  background: linear-gradient(135deg,#f97316,#ea580c);
+  background: linear-gradient(135deg,#2563eb,#1d4ed8);
   padding: 28px 28px 24px;
   text-align: center;
   position: relative;
@@ -470,10 +470,10 @@ input,select{font-family:inherit}
   letter-spacing: .5px;
 }
 .dp-inp::placeholder { color: rgba(255,255,255,.35); }
-.dp-inp:focus { border-color: #f97316; background: rgba(255,255,255,.1); }
+.dp-inp:focus { border-color: #2563eb; background: rgba(255,255,255,.1); }
 .dp-btn-main {
   width: 100%;
-  background: linear-gradient(135deg,#f97316,#ea580c);
+  background: linear-gradient(135deg,#2563eb,#1d4ed8);
   color: #fff;
   border: none;
   border-radius: 12px;
@@ -483,10 +483,10 @@ input,select{font-family:inherit}
   cursor: pointer;
   font-family: inherit;
   margin-top: 4px;
-  box-shadow: 0 4px 20px rgba(249,115,22,.4);
+  box-shadow: 0 4px 20px rgba(37,99,235,.4);
   transition: all .2s;
 }
-.dp-btn-main:hover { transform: translateY(-1px); box-shadow: 0 8px 28px rgba(249,115,22,.5); }
+.dp-btn-main:hover { transform: translateY(-1px); box-shadow: 0 8px 28px rgba(37,99,235,.5); }
 .dp-btn-ghost {
   width: 100%;
   background: none;
@@ -507,14 +507,14 @@ input,select{font-family:inherit}
   display: none;
   position: fixed;
   inset: 0;
-  background: #0f172a;
+  background: #f4f6fb;
   z-index: 2000;
   overflow-y: auto;
   font-family: 'DM Sans', sans-serif;
 }
 .dp-topbar {
-  background: #1e293b;
-  border-bottom: 1px solid rgba(255,255,255,.07);
+  background: #1a3a6b;
+  border-bottom: 1px solid rgba(255,255,255,.15);
   padding: 0 20px;
   height: 64px;
   display: flex;
@@ -525,11 +525,11 @@ input,select{font-family:inherit}
   z-index: 10;
 }
 .dp-logo { font-family: 'DM Serif Display', serif; font-size: 22px; color: #fff; }
-.dp-logo span { color: #f97316; }
+.dp-logo span { color: #2563eb; }
 .dp-partner-badge {
-  background: rgba(249,115,22,.15);
-  border: 1px solid rgba(249,115,22,.3);
-  color: #f97316;
+  background: rgba(37,99,235,.15);
+  border: 1px solid rgba(37,99,235,.3);
+  color: #2563eb;
   border-radius: 8px;
   padding: 4px 12px;
   font-size: 12px;
@@ -539,8 +539,8 @@ input,select{font-family:inherit}
 
 /* Online/Offline Toggle */
 .dp-toggle-card {
-  background: linear-gradient(135deg,#1e293b,#162032);
-  border: 1px solid rgba(255,255,255,.08);
+  background: #fff;
+  border: 1px solid #e8edf5;
   border-radius: 20px;
   padding: 20px 24px;
   display: flex;
@@ -550,7 +550,7 @@ input,select{font-family:inherit}
   box-shadow: 0 4px 24px rgba(0,0,0,.3);
 }
 .dp-status-info {}
-.dp-status-label { font-size: 13px; color: rgba(255,255,255,.5); margin-bottom: 4px; }
+.dp-status-label { font-size: 13px; color: #6b7280; margin-bottom: 4px; }
 .dp-status-text { font-size: 20px; font-weight: 800; }
 .dp-status-text.online { color: #22c55e; }
 .dp-status-text.offline { color: #6b7280; }
@@ -585,18 +585,18 @@ input,select{font-family:inherit}
 /* Stats Row */
 .dp-stats-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 20px; }
 .dp-stat-card {
-  background: #1e293b;
-  border: 1px solid rgba(255,255,255,.07);
+  background: #fff;
+  border: 1px solid #e8edf5;
   border-radius: 16px;
   padding: 16px;
   text-align: center;
 }
 .dp-stat-icon { font-size: 22px; margin-bottom: 6px; }
-.dp-stat-val { font-size: 20px; font-weight: 800; color: #fff; margin-bottom: 2px; }
+.dp-stat-val { font-size: 20px; font-weight: 800; color: #1a3a6b; margin-bottom: 2px; }
 .dp-stat-lbl { font-size: 11px; color: rgba(255,255,255,.45); }
 
 /* Tab Nav */
-.dp-tabs { display: flex; background: #1e293b; border-radius: 14px; border: 1px solid rgba(255,255,255,.07); overflow: hidden; margin-bottom: 20px; }
+.dp-tabs { display: flex; background: #e8edf5; border-radius: 14px; border: 1px solid #d1d5db; overflow: hidden; margin-bottom: 20px; }
 .dp-tab {
   flex: 1; padding: 12px 4px; border: none; background: none;
   font-size: 11px; font-weight: 600; color: rgba(255,255,255,.4);
@@ -604,7 +604,7 @@ input,select{font-family:inherit}
   display: flex; flex-direction: column; align-items: center; gap: 4px;
 }
 .dp-tab-icon { font-size: 18px; }
-.dp-tab.active { background: linear-gradient(135deg,#f97316,#ea580c); color: #fff; }
+.dp-tab.active { background: linear-gradient(135deg,#2563eb,#1d4ed8); color: #fff; }
 
 /* Order Cards */
 .dp-order-card {
@@ -615,14 +615,14 @@ input,select{font-family:inherit}
   margin-bottom: 12px;
   animation: fadeIn .25s ease;
 }
-.dp-order-card.urgent { border-color: rgba(249,115,22,.4); }
+.dp-order-card.urgent { border-color: rgba(37,99,235,.4); }
 .dp-order-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
-.dp-order-id { font-size: 13px; font-weight: 800; color: #f97316; }
+.dp-order-id { font-size: 13px; font-weight: 800; color: #2563eb; }
 .dp-order-time { font-size: 11px; color: rgba(255,255,255,.4); margin-top: 3px; }
 .dp-order-status {
   font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px;
 }
-.status-assigned { background: rgba(249,115,22,.15); color: #f97316; border: 1px solid rgba(249,115,22,.3); }
+.status-assigned { background: rgba(37,99,235,.15); color: #2563eb; border: 1px solid rgba(37,99,235,.3); }
 .status-picked { background: rgba(37,99,235,.15); color: #60a5fa; border: 1px solid rgba(37,99,235,.3); }
 .status-delivered { background: rgba(34,197,94,.15); color: #22c55e; border: 1px solid rgba(34,197,94,.3); }
 .status-pending { background: rgba(107,114,128,.15); color: #9ca3af; border: 1px solid rgba(107,114,128,.3); }
@@ -636,13 +636,13 @@ input,select{font-family:inherit}
   font-weight: 700; cursor: pointer; font-family: inherit; transition: all .2s;
 }
 .dp-btn-accept { background: linear-gradient(135deg,#22c55e,#16a34a); color: #fff; }
-.dp-btn-pickup { background: linear-gradient(135deg,#f97316,#ea580c); color: #fff; }
+.dp-btn-pickup { background: linear-gradient(135deg,#2563eb,#1d4ed8); color: #fff; }
 .dp-btn-deliver { background: linear-gradient(135deg,#2563eb,#1d4ed8); color: #fff; }
 .dp-btn-sm:hover { transform: scale(1.04); }
 
 /* Earnings */
 .dp-earn-card {
-  background: linear-gradient(135deg,#f97316,#ea580c);
+  background: linear-gradient(135deg,#2563eb,#1d4ed8);
   border-radius: 20px;
   padding: 24px;
   margin-bottom: 16px;
@@ -673,12 +673,12 @@ input,select{font-family:inherit}
   margin-bottom: 16px;
 }
 .dp-avatar {
-  width: 72px; height: 72px; background: linear-gradient(135deg,#f97316,#ea580c);
+  width: 72px; height: 72px; background: linear-gradient(135deg,#2563eb,#1d4ed8);
   border-radius: 50%; display: flex; align-items: center; justify-content: center;
   font-size: 32px; margin: 0 auto 12px;
 }
 .dp-profile-name { font-size: 20px; font-weight: 800; color: #fff; margin-bottom: 4px; }
-.dp-profile-id { font-size: 14px; color: #f97316; font-weight: 700; margin-bottom: 8px; }
+.dp-profile-id { font-size: 14px; color: #2563eb; font-weight: 700; margin-bottom: 8px; }
 .dp-profile-row {
   background: #1e293b;
   border: 1px solid rgba(255,255,255,.07);
@@ -716,7 +716,7 @@ input,select{font-family:inherit}
   gap: 12px;
   flex-wrap: wrap;
 }
-.adm-dp-id { font-size: 15px; font-weight: 800; color: #f97316; }
+.adm-dp-id { font-size: 15px; font-weight: 800; color: #2563eb; }
 .adm-dp-meta { font-size: 12px; color: rgba(255,255,255,.5); margin-top: 3px; }
 .adm-status-dot {
   width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
@@ -744,7 +744,7 @@ input,select{font-family:inherit}
 }
 
 @keyframes dpSlide { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
-.dp-order-card { animation: dpSlide .3s ease; }
+.dp-order-card { animation: dpSlide .3s ease; background: #fff; border-radius: 16px; border: 1px solid #e8edf5; padding: 16px; margin-bottom: 12px; }
 </style>
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
@@ -820,22 +820,6 @@ input,select{font-family:inherit}
     <span style="font-size:20px">⏰</span>
     <div><strong id="home-timer-text" style="color:#92400e"></strong><span style="color:#78350f;font-size:13px"> for delivery today between 7–9 PM</span></div>
   </div>
-
-  <div class="sec-title">Shop by Category</div>
-  <div class="cat-chips">
-    <button class="cat-chip" onclick="nav('listing','Grocery')"><span class="cat-icon">🛒</span>Grocery</button>
-    <button class="cat-chip" onclick="nav('listing','Dairy')"><span class="cat-icon">🥛</span>Dairy</button>
-    <button class="cat-chip" onclick="nav('listing','Beverages')"><span class="cat-icon">🥤</span>Beverages</button>
-    <button class="cat-chip" onclick="nav('listing','Home')"><span class="cat-icon">🏠</span>Home</button>
-    <button class="cat-chip" onclick="nav('listing','Stationery')"><span class="cat-icon">📄</span>Stationery</button>
-  </div>
-
-  <div class="sec-title">🌟 Featured Products</div>
-  <div class="grid" id="home-featured" style="grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:28px"></div>
-
-  <div class="sec-title">🏷️ Featured Deals</div>
-  <div class="grid" id="home-deals"></div>
-  <div style="margin-bottom:28px"></div>
 
   <div class="sec-title">💙 Best Value</div>
   <div class="grid" id="home-bestvalue"></div>
@@ -969,7 +953,7 @@ input,select{font-family:inherit}
   <div style="background:#0f172a;border-radius:16px;padding:20px;margin-top:24px">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
       <div style="font-weight:800;font-size:17px;color:#fff">🚚 Delivery Partner Management</div>
-      <button onclick="openCreatePartnerModal()" style="background:linear-gradient(135deg,#f97316,#ea580c);border:none;border-radius:10px;padding:10px 18px;color:#fff;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">+ Create Partner</button>
+      <button onclick="openCreatePartnerModal()" style="background:linear-gradient(135deg,#2563eb,#1d4ed8);border:none;border-radius:10px;padding:10px 18px;color:#fff;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">+ Create Partner</button>
     </div>
 
     <!-- Stats Bar -->
@@ -1351,7 +1335,7 @@ function renderCart() {
         <div style="font-size:64px;margin-bottom:16px">🛒</div>
         <div style="font-weight:700;font-size:18px;margin-bottom:8px;color:var(--navy)">Your cart is empty</div>
         <div style="color:var(--muted);margin-bottom:20px">Add products to get started</div>
-        <button class="btn btn-primary" style="width:auto;padding:12px 32px" onclick="nav('listing')">Shop Now</button>
+        <button class="btn btn-primary" style="width:100%;max-width:320px" onclick="nav('listing')">Shop Now</button>
       </div>`;
     return;
   }
@@ -1474,11 +1458,19 @@ function renderCheckout() {
         <input class="inp" id="cust-pin" placeholder="PIN Code *" style="flex:1" value="${customerInfo.pin||''}" oninput="customerInfo.pin=this.value"/>
       </div>
       <div style="background:linear-gradient(135deg,#eff6ff,#f0fdf4);border:1px solid #bfdbfe;border-radius:10px;padding:12px;margin-bottom:12px">
-        <div style="font-weight:700;color:var(--navy);font-size:13px;margin-bottom:6px">💳 Payment Options</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          ${['UPI','Cards','Wallets','NetBanking'].map(m=>`<span style="background:#fff;border:1px solid #e2e8f0;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:600;color:var(--navy)">${m}</span>`).join('')}
+        <div style="font-weight:700;color:var(--navy);font-size:13px;margin-bottom:8px">💳 Payment Method</div>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px">
+          <label style="display:flex;align-items:center;gap:10px;background:#eff6ff;border:2px solid #2563eb;border-radius:10px;padding:10px 14px;cursor:pointer">
+            <input type="radio" name="payment-method" value="online" id="pay-online" checked style="accent-color:#2563eb;width:16px;height:16px"/>
+            <div><div style="font-weight:700;font-size:13px;color:#1a3a6b">💳 Online Payment</div><div style="font-size:11px;color:#6b7280">UPI · Cards · Wallets · NetBanking</div></div>
+            <span style="margin-left:auto;font-size:10px;background:#2563eb;color:#fff;padding:2px 8px;border-radius:4px;font-weight:700">Recommended</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:10px;background:#fff;border:2px solid #e8edf5;border-radius:10px;padding:10px 14px;cursor:pointer" id="cod-option">
+            <input type="radio" name="payment-method" value="cod" id="pay-cod" style="accent-color:#2563eb;width:16px;height:16px"/>
+            <div><div style="font-weight:700;font-size:13px;color:#1a3a6b">💵 Cash on Delivery</div><div style="font-size:11px;color:#6b7280">Pay when your order arrives</div></div>
+          </label>
         </div>
-        <div style="font-size:12px;color:#065f46;margin-top:8px;font-weight:600">✅ Secure payment via Razorpay</div>
+        <div style="font-size:11px;color:#065f46;font-weight:600">🔒 Secure checkout · 100% safe</div>
       </div>
       <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:12px;margin-bottom:12px;font-size:13px">
         <strong>🚚 Delivery Slot:</strong> ${slotLabel}
@@ -1495,18 +1487,19 @@ function renderCheckout() {
       </div>
       ${cartItems().map(({p,q})=>`<div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:13px"><span>${p.img} ${p.name} × ${q}</span><strong>₹${p.price*q}</strong></div>`).join('')}
       <div style="border-top:1px solid var(--border);margin-top:10px;padding-top:10px">
-        <div class="sum-row"><span>Payment</span><span style="font-weight:700;color:#1d4ed8">💳 Online Payment</span></div>
+        <div class="sum-row"><span>Payment</span><span style="font-weight:700;color:#1d4ed8" id="review-payment-label">💳 Online Payment</span></div>
         <div class="sum-row"><span>Delivery Slot</span><span style="font-weight:700;color:var(--blue)">${slotLabel}</span></div>
         <div class="sum-row"><span>Delivery Fee</span><span style="color:${fee===0?'var(--green)':'#374151'}">${fee===0?'FREE':'₹'+fee}</span></div>
         <div style="display:flex;justify-content:space-between;font-size:16px;font-weight:800"><span>Total</span><span>₹${tot}</span></div>
       </div>
-      <button class="btn btn-secondary" style="margin-top:12px;background:linear-gradient(135deg,#2563eb,#1d4ed8)" onclick="openRazorpay()">💳 Pay ₹${tot} Securely →</button>
-      <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:10px;font-size:11px;color:var(--muted)">
+      <button class="btn btn-secondary" id="place-order-btn" style="margin-top:12px;background:linear-gradient(135deg,#2563eb,#1d4ed8)" onclick="handlePayment()">💳 Pay ₹${tot} Securely →</button>
+      <div id="payment-security-note" style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:10px;font-size:11px;color:var(--muted)">
         <span>🔒 Secured by</span><strong style="color:#072654">Razorpay</strong>
         <span style="margin-left:4px">· UPI · Cards · Wallets</span>
       </div>
     </div>`;
 
+  const _codSelected = (typeof getSelectedPayment === 'function') ? getSelectedPayment() === 'cod' : false;
   document.getElementById('checkout-content').innerHTML=`
     <div class="step-bar">
       ${stepCircle(1)}<span class="step-label" style="font-weight:${checkoutStep===1?700:400};color:${checkoutStep===1?'var(--navy)':'var(--muted)'}">Address</span>
@@ -1580,6 +1573,47 @@ function fillSavedAddr(idx) {
     const el=document.getElementById('cust-'+k); if(el) el.value=customerInfo[k]||'';
   });
   showToast('Address filled ✅');
+}
+
+
+// ── PAYMENT HANDLER (COD + Online) ───────────────────────────────────────
+function getSelectedPayment() {
+  const el = document.getElementById('pay-cod');
+  return (el && el.checked) ? 'cod' : 'online';
+}
+
+function handlePayment() {
+  const method = getSelectedPayment();
+  if (method === 'cod') {
+    placeCODOrder();
+  } else {
+    openRazorpay();
+  }
+}
+
+function placeCODOrder() {
+  const tot = orderTotal();
+  const orderId = 'SCT' + Date.now().toString().slice(-6);
+  const order = {
+    orderId,
+    items: cartItems(),
+    tot,
+    paymentId: 'COD',
+    paymentMethod: 'Cash on Delivery',
+    status: 'Confirmed',
+    slot: new Date().getHours() < 18 ? 'Today, 7–9 PM' : 'Tomorrow, 7–9 PM',
+    address: customerInfo,
+    date: new Date().toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'})
+  };
+  orderConfirm = order;
+  decrementFreeDelivery();
+  saveOrderToFirebase(order);
+  sendTelegramNotification(order);
+  cart = {};
+  updateCartUI();
+  nav('confirm');
+  renderConfirm();
+  showToast('✅ Order placed! Pay on delivery.');
 }
 
 // ── RAZORPAY PAYMENT ─────────────────────────────────────────────────────
@@ -2673,9 +2707,9 @@ function renderDPEarnings() {
     <div class="dp-earn-row"><span class="dp-earn-desc">Per delivery</span><span class="dp-earn-val">₹30</span></div>
     <div class="dp-earn-row"><span class="dp-earn-desc">Deliveries today</span><span class="dp-earn-val">${totalDeliveries}</span></div>
     <div class="dp-earn-row"><span class="dp-earn-desc">Bonus (5+ deliveries)</span><span class="dp-earn-val">${totalDeliveries>=5?'₹50':'Unlock at 5'}</span></div>
-    <div class="dp-earn-row" style="border:1px solid rgba(249,115,22,.3)">
+    <div class="dp-earn-row" style="border:1px solid rgba(37,99,235,.3)">
       <span style="font-weight:700;color:#fff">Today Total</span>
-      <span style="font-weight:800;font-size:16px;color:#f97316">₹${todayEarnings + (totalDeliveries>=5?50:0)}</span>
+      <span style="font-weight:800;font-size:16px;color:#2563eb">₹${todayEarnings + (totalDeliveries>=5?50:0)}</span>
     </div>
   `;
 }
@@ -2830,7 +2864,7 @@ async function renderAdminDPPanel() {
       <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:2px">Total Partners</div>
     </div>
     <div style="background:#1e293b;border-radius:12px;padding:14px;text-align:center;border:1px solid rgba(255,255,255,.07)">
-      <div style="font-size:22px;font-weight:800;color:#f97316">${dpPartners.length - approved}</div>
+      <div style="font-size:22px;font-weight:800;color:#2563eb">${dpPartners.length - approved}</div>
       <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:2px">Pending</div>
     </div>`;
 
@@ -2856,7 +2890,7 @@ async function renderAdminDPPanel() {
           </div>
           <div class="adm-dp-btns">
             ${!p.approved ? `<button onclick="adminApproveDp('${p.deliveryId}')" style="background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);border-radius:8px;padding:6px 12px;color:#22c55e;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">Approve</button>` : ''}
-            <button onclick="adminAssignOrder('${p.deliveryId}')" style="background:rgba(249,115,22,.15);border:1px solid rgba(249,115,22,.3);border-radius:8px;padding:6px 12px;color:#f97316;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">Assign Order</button>
+            <button onclick="adminAssignOrder('${p.deliveryId}')" style="background:rgba(37,99,235,.15);border:1px solid rgba(37,99,235,.3);border-radius:8px;padding:6px 12px;color:#2563eb;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">Assign Order</button>
             <button onclick="adminDeleteDp('${p.deliveryId}')" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);border-radius:8px;padding:6px 12px;color:#f87171;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">Remove</button>
           </div>
         </div>`).join('');
@@ -2881,11 +2915,11 @@ function renderAdminUnassignedOrders() {
   unassignedEl.innerHTML = unassigned.map(o => `
     <div style="background:#1e293b;border:1px solid rgba(249,115,22,.2);border-radius:12px;padding:14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
       <div>
-        <div style="font-weight:700;color:#f97316;font-size:13px">${o.orderId}</div>
+        <div style="font-weight:700;color:#2563eb;font-size:13px">${o.orderId}</div>
         <div style="font-size:12px;color:rgba(255,255,255,.5);margin-top:2px">${o.customerName||'Customer'} · ₹${o.total}</div>
         <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:2px">📍 ${(o.address||'').substring(0,40)}…</div>
       </div>
-      <button onclick="openAssignModal('${o.orderId}')" style="background:linear-gradient(135deg,#f97316,#ea580c);border:none;border-radius:8px;padding:8px 14px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">Assign →</button>
+      <button onclick="openAssignModal('${o.orderId}')" style="background:linear-gradient(135deg,#2563eb,#1d4ed8);border:none;border-radius:8px;padding:8px 14px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">Assign →</button>
     </div>`).join('');
 }
 
@@ -2917,7 +2951,7 @@ function openAssignModal(orderId) {
     listEl.innerHTML = available.map(p => `
       <button onclick="assignOrderToPartner('${orderId}','${p.deliveryId}')" style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-family:inherit;margin-bottom:8px;transition:.2s" onmouseover="this.style.background='rgba(249,115,22,.12)'" onmouseout="this.style.background='rgba(255,255,255,.05)'">
         <div style="text-align:left">
-          <div style="font-weight:700;color:#f97316;font-size:14px">${p.deliveryId}</div>
+          <div style="font-weight:700;color:#2563eb;font-size:14px">${p.deliveryId}</div>
           <div style="font-size:12px;color:rgba(255,255,255,.5);margin-top:2px">${p.name||'—'}</div>
         </div>
         <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:${p.status==='online'?'#22c55e':'#9ca3af'}">
@@ -3009,7 +3043,7 @@ window.saveOrderToFirebase = async function(order) {
       <div style="font-size:13px;color:rgba(255,255,255,.75);margin-top:4px;position:relative;z-index:1">Sign in to your Scart rider account</div>
     </div>
     <div class="dp-login-body">
-      <div style="font-size:12px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.8px;margin-bottom:16px;font-weight:700">Partner Credentials</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.8px;margin-bottom:16px;font-weight:700">Partner Credentials</div>
       <input class="dp-inp" id="dp-id-input" type="text" placeholder="Delivery ID (e.g. SCART001)" style="text-transform:uppercase;font-weight:700;letter-spacing:2px"/>
       <input class="dp-inp" id="dp-pw-input" type="password" placeholder="Password" onkeydown="if(event.key==='Enter')loginDeliveryPartner()"/>
       <div id="dp-login-error" style="display:none;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:10px 14px;font-size:12px;color:#f87171;font-weight:700;margin-bottom:12px;text-align:center"></div>
