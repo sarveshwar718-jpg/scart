@@ -386,6 +386,7 @@ input,select{font-family:inherit}
   position:relative;z-index:1;
 }
 </style>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
 <body>
 
@@ -450,10 +451,7 @@ input,select{font-family:inherit}
   <div class="hero">
     <h1>Shop Smart with Scart</h1>
     <p>Quality Products, Reliable Delivery · Trusted by thousands</p>
-    <div class="hero-search">
-      <input id="hero-search" type="text" placeholder="Search groceries, snacks, beverages..."/>
-      <button onclick="doSearch()">Search</button>
-    </div>
+    <input id="hero-search" type="text" style="display:none"/>
     <div class="trust-bar"></div>
   </div>
 
@@ -1053,9 +1051,25 @@ function renderCheckout() {
   }
 
   let form='';
-  if(checkoutStep===1) form=`
+  if(checkoutStep===1) {
+    // Load saved addresses for quick-fill
+    const uid = currentUser ? (currentUser.uid || currentUser.phone || 'guest') : 'guest';
+    const savedAddrs = JSON.parse(localStorage.getItem('scart_addrs_'+uid) || '[]');
+    const addrPicker = savedAddrs.length ? `
+      <div style="margin-bottom:12px">
+        <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Saved Addresses</div>
+        ${savedAddrs.map((a,i)=>`
+          <button onclick="fillSavedAddr(${i})" style="display:flex;align-items:center;gap:10px;width:100%;background:#f0f7ff;border:1.5px solid #bfdbfe;border-radius:10px;padding:10px 12px;margin-bottom:8px;cursor:pointer;font-family:inherit;text-align:left">
+            <span style="font-size:18px">${a.type==='Home'?'🏠':a.type==='Work'?'🏢':'📍'}</span>
+            <div><div style="font-weight:700;font-size:13px;color:var(--navy)">${a.type}</div><div style="font-size:12px;color:var(--muted)">${a.line1}, ${a.city} – ${a.pin}</div></div>
+            <span style="margin-left:auto;font-size:12px;color:var(--blue);font-weight:700">Use →</span>
+          </button>`).join('')}
+        <div style="font-size:12px;color:var(--muted);margin-bottom:10px;text-align:center">— or enter manually below —</div>
+      </div>` : '';
+    form=`
     <div class="summary-box">
       <div style="font-weight:700;font-size:15px;margin-bottom:14px">📍 Delivery Address</div>
+      ${addrPicker}
       <input class="inp" id="cust-name" placeholder="Full Name *" value="${customerInfo.name||''}" oninput="customerInfo.name=this.value"/>
       <input class="inp" id="cust-phone" placeholder="Phone Number *" type="tel" value="${customerInfo.phone||''}" oninput="customerInfo.phone=this.value"/>
       <input class="inp" id="cust-addr1" placeholder="House No / Street *" value="${customerInfo.addr1||''}" oninput="customerInfo.addr1=this.value"/>
@@ -1064,11 +1078,15 @@ function renderCheckout() {
         <input class="inp" id="cust-city" placeholder="City *" style="flex:1" value="${customerInfo.city||''}" oninput="customerInfo.city=this.value"/>
         <input class="inp" id="cust-pin" placeholder="PIN Code *" style="flex:1" value="${customerInfo.pin||''}" oninput="customerInfo.pin=this.value"/>
       </div>
-      <div style="background:#ecfdf5;border:1px solid #6ee7b7;border-radius:8px;padding:12px;margin-bottom:12px;font-size:13px;color:#065f46;font-weight:600">
-        💵 Payment: Cash on Delivery only
+      <div style="background:linear-gradient(135deg,#eff6ff,#f0fdf4);border:1px solid #bfdbfe;border-radius:10px;padding:12px;margin-bottom:12px">
+        <div style="font-weight:700;color:var(--navy);font-size:13px;margin-bottom:6px">💳 Payment Options</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          ${['UPI','Cards','Wallets','NetBanking'].map(m=>`<span style="background:#fff;border:1px solid #e2e8f0;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:600;color:var(--navy)">${m}</span>`).join('')}
+        </div>
+        <div style="font-size:12px;color:#065f46;margin-top:8px;font-weight:600">✅ Secure payment via Razorpay</div>
       </div>
       <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:12px;margin-bottom:12px;font-size:13px">
-        <strong>Delivery Slot:</strong> ${slotLabel}
+        <strong>🚚 Delivery Slot:</strong> ${slotLabel}
       </div>
       <button class="btn btn-primary" onclick="saveCustomerInfo()">Continue to Review →</button>
     </div>`;
@@ -1082,12 +1100,16 @@ function renderCheckout() {
       </div>
       ${cartItems().map(({p,q})=>`<div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:13px"><span>${p.img} ${p.name} × ${q}</span><strong>₹${p.price*q}</strong></div>`).join('')}
       <div style="border-top:1px solid var(--border);margin-top:10px;padding-top:10px">
-        <div class="sum-row"><span>Payment</span><span style="font-weight:700;color:var(--green)">💵 Cash on Delivery</span></div>
+        <div class="sum-row"><span>Payment</span><span style="font-weight:700;color:#1d4ed8">💳 Online Payment</span></div>
         <div class="sum-row"><span>Delivery Slot</span><span style="font-weight:700;color:var(--blue)">${slotLabel}</span></div>
         <div class="sum-row"><span>Delivery Fee</span><span style="color:${fee===0?'var(--green)':'#374151'}">${fee===0?'FREE':'₹'+fee}</span></div>
         <div style="display:flex;justify-content:space-between;font-size:16px;font-weight:800"><span>Total</span><span>₹${tot}</span></div>
       </div>
-      <button class="btn btn-secondary" style="margin-top:12px" onclick="placeOrder()">✅ Place Order</button>
+      <button class="btn btn-secondary" style="margin-top:12px;background:linear-gradient(135deg,#2563eb,#1d4ed8)" onclick="openRazorpay()">💳 Pay ₹${tot} Securely →</button>
+      <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:10px;font-size:11px;color:var(--muted)">
+        <span>🔒 Secured by</span><strong style="color:#072654">Razorpay</strong>
+        <span style="margin-left:4px">· UPI · Cards · Wallets</span>
+      </div>
     </div>`;
 
   document.getElementById('checkout-content').innerHTML=`
@@ -1137,6 +1159,7 @@ function sendTelegramNotification(order) {
     `👤 *Name:* ${customerInfo.name}\n` +
     `📞 *Number:* ${customerInfo.phone}\n` +
     `📍 *Address:* ${addr}\n\n` +
+    `💳 *Payment ID:* ${order.paymentId || 'N/A'}\n` +
     `✅ *Total: ₹${order.tot}*`;
 
   // Send both messages
@@ -1149,13 +1172,65 @@ function sendTelegramNotification(order) {
   setTimeout(() => sendMsg(msg2), 1000);
 }
 
-function placeOrder() {
+function fillSavedAddr(idx) {
+  const uid = currentUser ? (currentUser.uid || currentUser.phone || 'guest') : 'guest';
+  const addrs = JSON.parse(localStorage.getItem('scart_addrs_'+uid) || '[]');
+  const a = addrs[idx]; if(!a) return;
+  customerInfo.addr1 = a.line1;
+  customerInfo.addr2 = a.line2 || '';
+  customerInfo.city  = a.city;
+  customerInfo.pin   = a.pin;
+  // Fill inputs if visible
+  ['addr1','addr2','city','pin'].forEach(k=>{
+    const el=document.getElementById('cust-'+k); if(el) el.value=customerInfo[k]||'';
+  });
+  showToast('Address filled ✅');
+}
+
+// ── RAZORPAY PAYMENT ─────────────────────────────────────────────────────
+const RAZORPAY_KEY = 'YOUR_KEY_ID_HERE'; // ← Replace with your Razorpay Key ID
+
+function openRazorpay() {
+  const tot = orderTotal();
+  if(typeof Razorpay === 'undefined') {
+    showToast('Payment gateway loading… try again'); return;
+  }
+  const options = {
+    key: RAZORPAY_KEY,
+    amount: tot * 100,          // paise
+    currency: 'INR',
+    name: 'Scart',
+    description: 'Order Payment',
+    image: 'https://scart.co.in/icon-192.png',
+    prefill: {
+      name:    customerInfo.name  || '',
+      contact: customerInfo.phone || '',
+    },
+    notes: {
+      address: customerInfo.addr1 + ', ' + customerInfo.city
+    },
+    theme: { color: '#1d3a8a' },
+    modal: { escape: false },
+    handler: function(response) {
+      // Payment successful — complete the order
+      placeOrder(response.razorpay_payment_id);
+    }
+  };
+  const rzp = new Razorpay(options);
+  rzp.on('payment.failed', function(resp) {
+    showToast('❌ Payment failed: ' + resp.error.description);
+  });
+  rzp.open();
+}
+
+function placeOrder(paymentId) {
   const h=new Date().getHours(), isToday=h<18;
   orderConfirm={
     orderId:'SCT'+Math.random().toString(36).slice(2,8).toUpperCase(),
     items:cartItems(),
     sub:cartTotal(), fee:deliveryFee(), tot:orderTotal(),
-    day:isToday?'Today':'Tomorrow', slot:'7:00 PM – 9:00 PM'
+    day:isToday?'Today':'Tomorrow', slot:'7:00 PM – 9:00 PM',
+    paymentId: paymentId || 'N/A'
   };
 
   // Update user order count and save order to their history
@@ -1209,6 +1284,7 @@ function renderConfirm() {
         <div class="sum-row"><span>Subtotal</span><span>₹${o.sub}</span></div>
         <div class="sum-row"><span>Delivery</span><span style="color:${o.fee===0?'var(--green)':'#374151'}">₹${o.fee===0?'FREE':o.fee}</span></div>
         <div style="display:flex;justify-content:space-between;font-weight:800;font-size:16px"><span>Total Paid</span><span style="color:var(--navy)">₹${o.tot}</span></div>
+        ${o.paymentId&&o.paymentId!=='N/A'?`<div style="margin-top:8px;font-size:11px;color:var(--muted)">Payment ID: ${o.paymentId}</div>`:''}
       </div>
     </div>
     <button class="btn btn-primary" onclick="nav('home')">Continue Shopping</button>
@@ -1270,13 +1346,42 @@ function renderAccount() {
       ? `<div style="text-align:center;padding:40px;color:var(--muted)"><div style="font-size:48px;margin-bottom:12px">♡</div><div style="font-weight:600">Your wishlist is empty</div></div>`
       : `<div class="grid">${[...wishlist].map(id=>{const p=PRODUCTS.find(p=>p.id===id);return p?cardHTML(p):''}).join('')}</div>`;
   } else if(accTab==='addresses') {
+    const uid = currentUser ? (currentUser.uid || currentUser.phone || 'guest') : 'guest';
+    const savedAddrs = JSON.parse(localStorage.getItem('scart_addrs_'+uid) || '[]');
+    const addrListHTML = savedAddrs.length
+      ? savedAddrs.map((a,i)=>`
+        <div style="background:#f8fafc;border-radius:10px;padding:14px;margin-bottom:10px;border:1px solid var(--border);display:flex;align-items:start;gap:10px">
+          <span style="font-size:20px">${a.type==='Home'?'🏠':a.type==='Work'?'🏢':'📍'}</span>
+          <div style="flex:1">
+            <div style="font-weight:700;font-size:13px;margin-bottom:2px">${a.type}</div>
+            <div style="font-size:13px;color:var(--muted)">${a.line1}${a.line2?', '+a.line2:''}, ${a.city} – ${a.pin}</div>
+          </div>
+          <button onclick="deleteAddress(${i})" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:16px;padding:2px">🗑</button>
+        </div>`).join('')
+      : `<div style="text-align:center;padding:24px 0;color:var(--muted)"><div style="font-size:36px;margin-bottom:8px">📍</div><div style="font-size:13px">No saved addresses yet</div></div>`;
     html=`<div class="summary-box">
-      <div style="font-weight:700;margin-bottom:14px">Saved Addresses</div>
-      <div style="background:#f8fafc;border-radius:10px;padding:14px;margin-bottom:10px;border:1px solid var(--border)">
-        <div style="font-weight:600;margin-bottom:4px">🏠 Home</div>
-        <div style="font-size:13px;color:var(--muted)">123 Main Street, Near Park, City – 600001</div>
+      <div style="font-weight:700;margin-bottom:14px">📍 Saved Addresses</div>
+      ${addrListHTML}
+      <div id="addr-form-wrap" style="display:none;background:#f8fafc;border-radius:12px;padding:16px;border:1px solid var(--border);margin-top:10px">
+        <div style="font-weight:700;font-size:14px;margin-bottom:12px;color:var(--navy)">Add New Address</div>
+        <select class="inp" id="addr-type" style="margin-bottom:10px">
+          <option value="Home">🏠 Home</option>
+          <option value="Work">🏢 Work</option>
+          <option value="Other">📍 Other</option>
+        </select>
+        <input class="inp" id="addr-line1" placeholder="House / Flat No., Street Name *" style="margin-bottom:10px"/>
+        <input class="inp" id="addr-line2" placeholder="Area / Landmark (optional)" style="margin-bottom:10px"/>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+          <input class="inp" id="addr-city" placeholder="City *" style="margin-bottom:0"/>
+          <input class="inp" id="addr-pin" placeholder="PIN Code *" type="number" style="margin-bottom:0"/>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-primary" style="margin-bottom:0;flex:1" onclick="saveAddress()">Save Address</button>
+          <button class="btn btn-default" style="margin-bottom:0;width:auto;padding:12px 16px" onclick="document.getElementById('addr-form-wrap').style.display='none'">Cancel</button>
+        </div>
+        <div id="addr-err" style="display:none;color:var(--red);font-size:12px;font-weight:700;margin-top:8px;text-align:center"></div>
       </div>
-      <button class="btn btn-outline" style="border-style:dashed">+ Add New Address</button>
+      <button class="btn btn-outline" style="border-style:dashed;margin-top:10px" onclick="document.getElementById('addr-form-wrap').style.display='block';document.getElementById('addr-err').style.display='none'">+ Add New Address</button>
     </div>`;
   } else {
     html=`<div class="ai-chat-wrapper">
@@ -1289,7 +1394,7 @@ function renderAccount() {
             <div class="name">Scart Assistant</div>
             <div class="status"><span style="width:6px;height:6px;background:#22c55e;border-radius:50%;display:inline-block"></span>Online &middot; AI-powered</div>
           </div>
-          <div style="margin-left:auto;font-size:11px;color:rgba(255,255,255,.4);text-align:right;line-height:1.4">Powered by<br/><span style="color:#93c5fd;font-weight:700">Claude AI</span></div>
+          <div style="margin-left:auto;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.25);border-radius:20px;padding:4px 10px;font-size:11px;color:#6ee7b7;font-weight:600">● Live</div>
         </div>
         <div class="ai-messages" id="ai-msg-list">
           <div class="msg-bubble msg-bot">
@@ -1764,27 +1869,52 @@ document.getElementById('hero-search').addEventListener('input', function() {
 document.getElementById('hero-search').addEventListener('keydown',e=>{if(e.key==='Enter')doSearch();});
 renderHome();
 loadProductsFromFirebase();
+// Clear any old fake/hardcoded address data from previous versions
+try { ['home','work','other','default'].forEach(k=>{ const old='scart_addr_'+k; if(localStorage.getItem(old))localStorage.removeItem(old); }); } catch(e){}
 
-// ── AI CHATBOT ────────────────────────────────────────────────────────────
-const AI_SYSTEM = `You are a helpful, friendly customer support assistant for Scart — a quick-commerce grocery delivery app in India. 
-Scart delivers groceries, dairy, beverages, home essentials, and stationery.
-Key facts:
-- Delivery: Same day if order placed before 6 PM (7–9 PM slot), else next day
-- Delivery fee: FREE for first 2 orders, then ₹10; FREE on orders above ₹300
-- Payment: Online payment via UPI, cards, wallets
-- Returns: Contact within 24 hours of delivery for any issues
-- Referral: Users get referral codes; each code gives 1 extra free delivery
-- Products are 100% authentic and verified
-- Orders tracked by Order ID starting with SCT
-- Support: This AI chat is the primary support channel
-Keep replies concise (2–4 sentences max), warm, and helpful. Use emojis sparingly. Answer in the same language the user writes in.`;
+// ── ADDRESS MANAGEMENT ───────────────────────────────────────────────────
+function getAddrKey() {
+  const uid = currentUser ? (currentUser.uid || currentUser.phone || 'guest') : 'guest';
+  return 'scart_addrs_' + uid;
+}
+function saveAddress() {
+  const line1 = (document.getElementById('addr-line1')||{}).value?.trim();
+  const line2 = (document.getElementById('addr-line2')||{}).value?.trim();
+  const city  = (document.getElementById('addr-city')||{}).value?.trim();
+  const pin   = (document.getElementById('addr-pin')||{}).value?.trim();
+  const type  = (document.getElementById('addr-type')||{}).value;
+  const err   = document.getElementById('addr-err');
+  if(!line1 || !city || !pin) {
+    if(err){err.style.display='block';err.textContent='Please fill in all required fields.';}
+    return;
+  }
+  if(!/^\d{6}$/.test(pin)) {
+    if(err){err.style.display='block';err.textContent='Enter a valid 6-digit PIN code.';}
+    return;
+  }
+  const addrs = JSON.parse(localStorage.getItem(getAddrKey()) || '[]');
+  addrs.push({type, line1, line2, city, pin});
+  localStorage.setItem(getAddrKey(), JSON.stringify(addrs));
+  showToast('Address saved ✅');
+  accTab='addresses';
+  renderAccount();
+  setTimeout(()=>{ document.querySelectorAll('.acc-tab').forEach(b=>{ b.classList.toggle('active', b.getAttribute('onclick')||'' .includes('addresses')); }); },10);
+}
+function deleteAddress(idx) {
+  if(!confirm('Remove this address?')) return;
+  const addrs = JSON.parse(localStorage.getItem(getAddrKey()) || '[]');
+  addrs.splice(idx, 1);
+  localStorage.setItem(getAddrKey(), JSON.stringify(addrs));
+  showToast('Address removed');
+  accTab='addresses';
+  renderAccount();
+  setTimeout(()=>{ document.querySelectorAll('.acc-tab').forEach(b=>{ b.classList.toggle('active', b.getAttribute('onclick')||'' .includes('addresses')); }); },10);
+}
 
-let aiHistory = [];
+// ── AI CHATBOT (Smart Rule-Based) ─────────────────────────────────────────
 let aiTyping = false;
 
-function initAIChat() {
-  aiHistory = [];
-}
+function initAIChat() {}
 
 function addMsg(role, text) {
   const list = document.getElementById('ai-msg-list');
@@ -1792,30 +1922,51 @@ function addMsg(role, text) {
   const now = new Date().toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
   const div = document.createElement('div');
   div.className = 'msg-bubble ' + (role === 'user' ? 'msg-user' : 'msg-bot');
-  div.innerHTML = text.replace(/\n/g, '<br/>') + '<span class="msg-time">' + now + '</span>';
+  div.innerHTML = text + '<span class="msg-time">' + now + '</span>';
   list.appendChild(div);
   list.scrollTop = list.scrollHeight;
 }
 
 function showTyping() {
   const list = document.getElementById('ai-msg-list');
-  if (!list) return null;
+  if (!list) return;
   const el = document.createElement('div');
-  el.className = 'typing-indicator';
-  el.id = 'ai-typing';
+  el.className = 'typing-indicator'; el.id = 'ai-typing';
   el.innerHTML = '<span></span><span></span><span></span>';
-  list.appendChild(el);
-  list.scrollTop = list.scrollHeight;
-  return el;
+  list.appendChild(el); list.scrollTop = list.scrollHeight;
 }
+function removeTyping() { const el=document.getElementById('ai-typing'); if(el)el.remove(); }
 
-function removeTyping() {
-  const el = document.getElementById('ai-typing');
-  if (el) el.remove();
+// ── Knowledge base ──
+const SCART_KB = [
+  { keys:['track','order','status','where is my','kahan','mera order','sct'], reply:`Your order ID starts with <b>SCT</b>. Go to <b>Account → Orders</b> to see live status of all your orders. If it's been more than 24 hrs, let me know!` },
+  { keys:['deliver','timing','slot','time','kab aayega','kitne baje','when'], reply:`We deliver <b>same day between 7–9 PM</b> if you order before 6 PM. Orders placed after 6 PM are delivered the <b>next day</b> in the same slot.` },
+  { keys:['delivery charge','delivery fee','free delivery','shipping','charge'], reply:`Delivery is <b>FREE for your first 2 orders</b>! After that it's just ₹10. Orders above ₹300 always get free delivery.` },
+  { keys:['return','refund','replace','damaged','broken','wrong item','galat'], reply:`If you receive a damaged, wrong, or missing item, <b>contact us within 24 hours</b> of delivery. Go to Account → Orders, tap the order, and raise a return request.` },
+  { keys:['payment','pay','upi','card','wallet','gpay','phonepe','paytm','cash'], reply:`We accept <b>UPI, Credit/Debit Cards, and Wallets</b> (PhonePe, GPay, Paytm). Cash on delivery is not available. All payments are 100% secure.` },
+  { keys:['referral','refer','code','invite','bonus','friend'], reply:`Share your referral code from <b>Account → Referral</b>. Every friend who joins gives you <b>1 extra free delivery</b>! There's no limit on referrals.` },
+  { keys:['cancel','cancellation','cancel order'], reply:`You can cancel an order <b>before it is picked up</b> (usually within 30 mins of placing). Go to Account → Orders → tap your order → Cancel. Refunds are processed in 2–3 business days.` },
+  { keys:['product','quality','authentic','original','fake','genuine'], reply:`All products on Scart are <b>100% authentic</b> and sourced directly from verified suppliers. We do not sell expired or duplicate goods.` },
+  { keys:['minimum','min order','minimum order'], reply:`There is <b>no minimum order value</b> on Scart. You can order even a single item!` },
+  { keys:['account','login','sign in','signup','register','otp'], reply:`You can log in using your <b>mobile number (OTP)</b> or <b>Google account</b>. If you face any login issues, try clearing the browser cache or switching networks.` },
+  { keys:['address','location','pincode','area','deliver here','serviceable'], reply:`You can save multiple delivery addresses under <b>Account → Addresses</b>. If your area is not serviceable yet, we are expanding soon — stay tuned!` },
+  { keys:['offer','discount','coupon','promo','sale','deal'], reply:`Check the <b>Home page and Shop tab</b> for active offers. First-time users get extra-free delivery. Referrals also unlock free deliveries!` },
+  { keys:['contact','support','help','problem','issue','complaint'], reply:`You are already in the right place! Type your question and I will help instantly. For urgent issues, you can also reach us at <b>support@scart.co.in</b>.` },
+  { keys:['hi','hello','hey','hii','namaste','namaskar','helo'], reply:`Hello! 👋 Welcome to Scart Support. I can help you with orders, delivery, returns, payments, and more. What do you need help with?` },
+  { keys:['thanks','thank you','ok','okay','great','nice','done','got it'], reply:`You're welcome! Is there anything else I can help you with? 😊` },
+  { keys:['product not available','out of stock','nahi hai','stock'], reply:`If a product shows <b>Out of Stock</b>, it means we have temporarily run out. Check back in a few hours — we restock daily!` },
+  { keys:['grocery','dal','rice','atta','oil','sabzi','vegetable','fruit'], reply:`We stock a wide range of <b>groceries</b> — staples, oils, spices, dairy, beverages, and more. Browse the Shop tab by category to find what you need.` },
+];
+
+function getBotReply(msg) {
+  const q = msg.toLowerCase();
+  for (const entry of SCART_KB) {
+    if (entry.keys.some(k => q.includes(k))) return entry.reply;
+  }
+  return `I am not sure about that, but I am here to help! You can ask me about <b>orders, delivery timings, returns, payments, referrals</b>, or anything else about Scart. 😊`;
 }
 
 function sendChip(btn, text) {
-  // Hide chips after first use
   const chips = document.getElementById('ai-chips');
   if (chips) chips.style.display = 'none';
   const input = document.getElementById('ai-input');
@@ -1823,49 +1974,26 @@ function sendChip(btn, text) {
   sendAIMessage();
 }
 
-async function sendAIMessage() {
+function sendAIMessage() {
   const input = document.getElementById('ai-input');
   const sendBtn = document.getElementById('ai-send-btn');
   if (!input || aiTyping) return;
   const text = input.value.trim();
   if (!text) return;
-
   input.value = '';
-  aiHistory.push({ role: 'user', content: text });
   addMsg('user', text);
-
-  // Hide quick chips once user starts typing
   const chips = document.getElementById('ai-chips');
   if (chips) chips.style.display = 'none';
-
   aiTyping = true;
   if (sendBtn) sendBtn.disabled = true;
   showTyping();
-
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        system: AI_SYSTEM,
-        messages: aiHistory
-      })
-    });
-    const data = await res.json();
-    const reply = data.content && data.content[0] ? data.content[0].text : 'Sorry, I could not get a response. Please try again.';
-    aiHistory.push({ role: 'assistant', content: reply });
+  setTimeout(() => {
     removeTyping();
-    addMsg('bot', reply);
-  } catch (e) {
-    removeTyping();
-    addMsg('bot', 'Oops! Something went wrong. Please try again in a moment.');
-  }
-
-  aiTyping = false;
-  if (sendBtn) sendBtn.disabled = false;
-  if (input) input.focus();
+    addMsg('bot', getBotReply(text));
+    aiTyping = false;
+    if (sendBtn) sendBtn.disabled = false;
+    if (input) input.focus();
+  }, 700 + Math.random()*400);
 }
 
 // ── SERVICE WORKER (PWA) ──────────────────────────────────────────────────
